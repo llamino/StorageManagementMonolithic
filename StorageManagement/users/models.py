@@ -1,9 +1,18 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group, Permission
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.conf import settings
+
+
+# from django.apps import apps
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -27,6 +36,10 @@ class UserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_superuser=True.'))
 
         return self.create_user(email, password, **extra_fields)
+
+
+
+
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -64,7 +77,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     image = models.ImageField(upload_to='profile_pics', blank=True, null=True)
@@ -74,7 +87,7 @@ class Profile(models.Model):
         return self.user.email
 
 class Address(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='addresses')
     province = models.CharField(max_length=50, blank=True, null=True)
     city = models.CharField(max_length=50, blank=True, null=True)
     street = models.CharField(max_length=50, blank=True, null=True)
@@ -86,5 +99,40 @@ class Address(models.Model):
 
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, created, **kwargs):
+    #This signal has been created for build a profile model for each User
     if created:
         Profile.objects.get_or_create(user=instance)
+
+# @receiver(post_save, sender=User)
+# def save_profile(sender, instance, created, **kwargs):
+#     if created:
+#         Profile = apps.get_model('users', 'Profile')
+#         Profile.objects.get_or_create(user=instance)
+
+
+
+
+class CustomLogEntry(models.Model):
+    action_time = models.DateTimeField(_('action time'), auto_now=True)
+    user = models.ForeignKey(User, models.CASCADE, verbose_name=_('user'))  # به مدل کاربر سفارشی اشاره می‌کند
+    content_type = models.ForeignKey(
+        ContentType,
+        models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_('content type'),
+    )
+    object_id = models.TextField(_('object id'), blank=True, null=True)
+    object_repr = models.CharField(_('object repr'), max_length=200)
+    action_flag = models.PositiveSmallIntegerField(_('action flag'))
+    change_message = models.TextField(_('change message'), blank=True)
+
+    class Meta:
+        verbose_name = _('log entry')
+        verbose_name_plural = _('log entries')
+
+    def is_deletion(self):
+        return self.action_flag == DELETION
+
+    def __str__(self):
+        return self.object_repr

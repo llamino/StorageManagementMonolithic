@@ -2,7 +2,12 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from .models import User, Profile, Address
+from .models import CustomLogEntry
 
+@admin.register(CustomLogEntry)
+class CustomLogEntryAdmin(admin.ModelAdmin):
+    list_display = ('action_time', 'user', 'content_type', 'object_repr', 'action_flag')
+    search_fields = ('object_repr', 'change_message')
 # Define an Inline for Address
 class AddressInline(admin.TabularInline):
     model = Address
@@ -34,6 +39,9 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
+    # def has_delete_permission(self, request, obj=None):
+    #     return True  # اجازه حذف را فعال می‌کند
+
     # Readonly fields
     readonly_fields = ('create_date', 'update_date')
 
@@ -50,9 +58,11 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__email', 'first_name', 'last_name')
     ordering = ('user__email',)
 
+
 # Register the Address model (Optional: for direct access in admin panel)
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     list_display = ('user', 'province', 'city', 'street', 'alley', 'house_number')
     search_fields = ('user__email', 'province', 'city', 'street')
     ordering = ('user__email',)
+    verbose_name_plural = 'addresses'

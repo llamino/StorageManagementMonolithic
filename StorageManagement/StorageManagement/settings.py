@@ -14,14 +14,14 @@ from datetime import timedelta
 from pathlib import Path
 from mongoengine import connect
 
-connect(
-    db='recommendation_management',   # نام دیتابیس MongoDB
-    host='localhost',          # آدرس سرور MongoDB
-    port=27017,                # پورت MongoDB
-    username='root',  # نام کاربری، در صورت نیاز
-    password='Am13810420',  # رمز عبور، در صورت نیاز
-    authentication_source='admin'  # دیتابیس احراز هویت، اگر نیاز باشد
-)
+# connect(
+#     db='recommendation_management',   # نام دیتابیس MongoDB
+#     host='localhost',          # آدرس سرور MongoDB
+#     port=27017,                # پورت MongoDB
+#     username='root',  # نام کاربری، در صورت نیاز
+#     password='Am13810420',  # رمز عبور، در صورت نیاز
+#     authentication_source='admin'  # دیتابیس احراز هویت، اگر نیاز باشد
+# )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,11 +47,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users.apps.UsersConfig',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'orders',
     'products',
-    'users',
     'suppliers',
     'warehouses',
     'discounts',
@@ -126,9 +127,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),
 }
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -153,7 +158,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
@@ -161,4 +166,14 @@ STATIC_ROOT = BASE_DIR / 'static'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.User'
+
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',
+# ]
+AUTHENTICATION_BACKENDS = [
+    'users.backends.CustomAuthenticationBackend',  # اشاره به فایل backends.py
+    'django.contrib.auth.backends.ModelBackend',   # بک‌اند پیش‌فرض جنگو
+]
 

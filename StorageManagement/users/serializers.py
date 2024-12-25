@@ -1,10 +1,17 @@
 from rest_framework import serializers
 from .models import User, Profile, Address
+from django.core.files.storage import default_storage
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ['id', 'first_name', 'last_name', 'image', 'bio']
         read_only_fields = ('id',)
+
+    def validate_image(self, value):
+        if not hasattr(value, 'file'):
+            raise serializers.ValidationError("Invalid file format.")
+        return value
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True, required=True)
@@ -47,22 +54,34 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class AddressSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Address
-        fields = '__all__'
+        fields = ['province', 'city', 'street', 'alley', 'house_number']
+        read_only_fields = ('id',)
+    def create(self, validated_data):
+        # مرتبط کردن کاربر جاری
+        request = self.context.get('request')  # گرفتن درخواست از context
+        if not request or not request.user:
+            raise serializers.ValidationError({"user": "User must be authenticated."})
+        validated_data['user'] = request.user  # اضافه کردن کاربر به داده‌های معتبر
+        address = Address.objects.create(**validated_data)
+        return address
+
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'phone_number', 'is_active', 'profile', 'created_date', 'updated_date']
-        read_only_fields = ['is_active', 'created_date', 'updated_date']
+        fields = ['id', 'email', 'phone_number', 'is_active', 'profile', 'create_date', 'update_date']
+        read_only_fields = ['is_active', 'create_date', 'update_date', 'email']
 
     def update(self, instance, validated_data):
         # استخراج داده‌های پروفایل
         profile_data = validated_data.pop('profile', None)
-
+        print(f'amin ahmad : {profile_data}')
         # به‌روزرسانی مدل User
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -72,9 +91,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if profile_data:
             profile, created = Profile.objects.get_or_create(user=instance)
             for attr, value in profile_data.items():
-                setattr(profile, attr, value)
+                if value is not None:
+                    setattr(profile, attr, value)
             profile.save()
 
         return instance
-
 

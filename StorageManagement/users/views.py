@@ -1,4 +1,7 @@
+import json
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.contrib.auth import authenticate
+from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
@@ -8,8 +11,10 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.generics import GenericAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
-from rest_framework_simplejwt.exceptions import TokenError
-from .models import Profile, Address
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+
+
+from .models import Profile, Address, User
 from .serializers import ProfileSerializer, UserProfileSerializer, AddressSerializer, RegisterSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 logger = logging.getLogger(__name__)
@@ -24,9 +29,9 @@ class AddressViewSet(viewsets.ModelViewSet):
         return user.addresses.all()
 
     def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, context={'request': request})  # اضافه کردن context
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)  # مرتبط کردن آدرس با کاربر
+        serializer.save()  # user به صورت خودکار اضافه می‌شود
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
@@ -69,23 +74,41 @@ class UserProfielView(APIView):
     serializer_class = UserProfileSerializer
     def get(self, request):
         user = request.user
-        serializer = UserProfileSerializer(user)
+        serializer = self.serializer_class(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):
         user = request.user
-        serializer = UserProfileSerializer(user, data=request.data)
+        data = request.data
+        profile_data = {}
+        # این تغییر ساختار به این دلیل است که در postman داده ها را به صورت form-data ارسال میکنم. اگر قرار بود به صورت json ارسال کنم، نیاز نبود که به این شکل تغییر ساختار بدهم
+        for key, value in data.items():
+            if key.startswith('profile[') and key.endswith(']'):
+                # حذف 'profile[' و ']' از کلیدها
+                profile_key = key[8:-1]
+                profile_data[profile_key] = value[0] if isinstance(value, list) else value
+        # حذف کلیدهای مربوط به پروفایل از دیکشنری اصلی
+        data = {k: v for k, v in data.items() if not k.startswith('profile[')}
+        # اضافه کردن دیکشنری پروفایل به دیکشنری اصلی
+        data['profile'] = profile_data
+
+        serializer = self.serializer_class(user, data=data, partial=False)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, *args, **kwargs):
+    def patch(self, request):
         user = request.user
-        serializer = UserProfileSerializer(user, data=request.data)
+        serializer = self.serializer_class(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        user.is_active = False
+        user.save()
+        return Response({"detail": "User deactivated successfully."}, status=status.HTTP_204_NO_CONTENT)
 class RegisterView(APIView):
     serializer_class = RegisterSerializer
     def post(self, request):
@@ -111,11 +134,16 @@ class LoginView(APIView):
 
         if not email or not password:
             return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
-
+        try:
+            print(User.objects.filter(email=email).exists())
+            # print(user.password)
+        except:
+            raise AuthenticationFailed({'error': 'amin ahmadi'})
         try:
             user = authenticate(request, username=email, password=password)
             if not user:
                 logger.warning(f"Failed login attempt for email: {email}")
+
                 raise AuthenticationFailed('Invalid credentials')
 
             refresh = RefreshToken.for_user(user)
@@ -128,6 +156,7 @@ class LoginView(APIView):
             logger.warning(f"Authentication failed for email: {email} - {e}")
             return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:
+
             logger.error(f"Unexpected error during login: {e}")
             return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -150,22 +179,28 @@ class RefreshAccessTokenView(APIView):
             return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
 
     def post(self, request):
+        refresh_token = request.data.get('refresh_token')
+
+        if not refresh_token:
+            logger.warning("Logout attempted without providing a refresh token.")
+            return JsonResponse({"msg": "Refresh token is required"}, status=400)
+
         try:
-            refresh_token = request.data.get('refresh')
-            if refresh_token:
-                refresh = RefreshToken(refresh_token)
-                refresh.blacklist()
-            logger.info(f"User logged out: {request.user.username}")
-            return Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
-        except TokenError as e:
-            logger.warning(f"Error blacklisting token: {e}")
-            return Response({'error': 'Invalid refresh token'}, status=status.HTTP_400_BAD_REQUEST)
+            # Attempt to blacklist the refresh token
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            logger.info(f"User {request.user.email} successfully logged out.")
+            return JsonResponse({"msg": "Successfully logged out"}, status=200)
+        except TokenError:
+            logger.warning(f"Invalid or already blacklisted token provided by user {request.user.email}.")
+            return JsonResponse({"msg": "Token is invalid or already blacklisted"}, status=400)
         except Exception as e:
-            logger.error(f"Unexpected error during logout: {e}")
-            return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.error(f"Unexpected error during logout for user {request.user.email}: {str(e)}")
+            return JsonResponse({"msg": "Failed to log out", "error": str(e)}, status=400)
 
 class ValidateJWTView(APIView):
     authentication_classes = [JWTAuthentication]

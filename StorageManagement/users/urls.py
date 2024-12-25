@@ -8,10 +8,11 @@ router.register('address', views.AddressViewSet, basename='address')
 
 urlpatterns = [
     path('profile/', views.UserProfielView.as_view(), name='profile'),
-    path('create_profile/', views.UserProfielView.as_view(), name='create_profile'),
     path('edit_profile/', views.UserProfielView.as_view(), name='edit_profile'),
+    path('delete_profile/', views.UserProfielView.as_view(), name='delete_profile'),
     path('register/', views.RegisterView.as_view(), name='register'),
     path('login/', views.LoginView.as_view(), name='login'),
+    path('logout/', views.LogoutView.as_view(), name='logout'),
     path('refresh/', views.RefreshAccessTokenView.as_view(), name='refresh'),
     path('validate_jwt/', views.ValidateJWTView.as_view(), name='validate_jwt'),
 ] + router.urls
