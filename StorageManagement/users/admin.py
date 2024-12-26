@@ -4,16 +4,27 @@ from django.utils.translation import gettext_lazy as _
 from .models import User, Profile, Address
 from .models import CustomLogEntry
 
-@admin.register(CustomLogEntry)
-class CustomLogEntryAdmin(admin.ModelAdmin):
-    list_display = ('action_time', 'user', 'content_type', 'object_repr', 'action_flag')
-    search_fields = ('object_repr', 'change_message')
-# Define an Inline for Address
+#---------------------------begin Inline classes-----------------------------------------------
+
 class AddressInline(admin.TabularInline):
     model = Address
     extra = 1
     fields = ('province', 'city', 'street', 'alley', 'house_number')
 
+#--------------------------end Inline classes-----------------------------------------------------
+
+
+
+
+
+
+#--------------------------begin custom user admin classes-----------------------------------------------------
+
+@admin.register(CustomLogEntry)
+class CustomLogEntryAdmin(admin.ModelAdmin):
+    list_display = ('action_time', 'user', 'content_type', 'object_repr', 'action_flag')
+    search_fields = ('object_repr', 'change_message')
+# Define an Inline for Address
 
 # Define a custom UserAdmin
 class UserAdmin(BaseUserAdmin):
@@ -51,18 +62,26 @@ class UserAdmin(BaseUserAdmin):
 # Register the custom User model
 admin.site.register(User, UserAdmin)
 
-# Register the Profile model
+#--------------------------end of custom user admin classes-----------------------------------------------------
+
+
+
+
+
+
+#--------------------------begin admin classes------------------------------------------------
+
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'first_name', 'last_name')
     search_fields = ('user__email', 'first_name', 'last_name')
     ordering = ('user__email',)
 
-
-# Register the Address model (Optional: for direct access in admin panel)
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     list_display = ('user', 'province', 'city', 'street', 'alley', 'house_number')
     search_fields = ('user__email', 'province', 'city', 'street')
     ordering = ('user__email',)
     verbose_name_plural = 'addresses'
+
+#---------------------------end of admin classes-----------------------------------
