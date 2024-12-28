@@ -12,8 +12,6 @@ from rest_framework.generics import GenericAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-
-
 from .models import Profile, Address, User
 from .serializers import ProfileSerializer, UserProfileSerializer, AddressSerializer, RegisterSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -69,7 +67,7 @@ class AddressViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserProfielView(APIView):
+class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserProfileSerializer
     def get(self, request):

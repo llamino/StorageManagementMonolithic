@@ -20,7 +20,7 @@ class CategorySupplier(models.Model):
 class ProductDetailSupplier(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
     description = models.TextField()
-    categories = models.ManyToManyField(CategorySupplier, related_name='products')
+    categories = models.ManyToManyField(CategorySupplier, related_name='products', null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.name
@@ -45,3 +45,5 @@ class InventorySupplier(models.Model):
     price = models.IntegerField()
     def __str__(self):
         return f'{self.supplier} - {self.product} - {self.stock}'
+
+
