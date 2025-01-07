@@ -43,6 +43,9 @@ class TaskForEmployee(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     was_delivered_at = models.DateTimeField(auto_now_add=True)
     is_done = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('employee','task')
     def __str__(self):
         return f'{self.employee} {self.task} {self.was_delivered_at}'
 
@@ -55,9 +58,16 @@ class Inventory(models.Model):
     product = models.ForeignKey(ProductProperty, on_delete=models.CASCADE, related_name="inventories") # foreign key from ProductProperty table in the Product app
     stock = models.IntegerField()
 
+    class Meta:
+        unique_together = ('warehouse', 'product')
+
+    def __str__(self):
+        return f'{self.warehouse} - {self.product} - {self.stock}'
+
 class PurchaseOrderFromSupplier(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="orders") # foreign key from Supplier table in the supplier app
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, related_name='orders')
+    is_applied_to_warehouse = models.BooleanField(default=False)
     order_date = models.DateField(auto_now_add=True)
     expected_delivery_date = models.DateField()
     total_price_order = models.DecimalField(max_digits=10, decimal_places=2)

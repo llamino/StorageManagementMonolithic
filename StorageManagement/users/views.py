@@ -12,7 +12,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 import logging
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from .models import Profile, Address, User
-from .serializers import ProfileSerializer, UserProfileSerializer, AddressSerializer, RegisterSerializer
+from .serializers import ProfileSerializer,LoginSerializer, UserProfileSerializer, AddressSerializer, RegisterSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 logger = logging.getLogger(__name__)
 
@@ -22,8 +22,14 @@ class AddressViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated,]
 
     def get_queryset(self):
+        # بررسی اینکه آیا درخواست برای تولید اسکیما است یا خیر
+        if getattr(self, 'swagger_fake_view', False):
+            return Address.objects.none()
+
         user = self.request.user
-        return user.addresses.all()
+        if user.is_authenticated:
+            return user.addresses.all()
+        return Address.objects.none()
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={'request': request})  # اضافه کردن context
@@ -126,21 +132,17 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
+        serializer = LoginSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if not email or not password:
-            return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            print(User.objects.filter(email=email).exists())
-            # print(user.password)
-        except:
-            raise AuthenticationFailed({'error': 'amin ahmadi'})
+        email = serializer.validated_data['email']
+        password = serializer.validated_data['password']
+
         try:
             user = authenticate(request, username=email, password=password)
             if not user:
                 logger.warning(f"Failed login attempt for email: {email}")
-
                 raise AuthenticationFailed('Invalid credentials')
 
             refresh = RefreshToken.for_user(user)
@@ -153,7 +155,6 @@ class LoginView(APIView):
             logger.warning(f"Authentication failed for email: {email} - {e}")
             return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:
-
             logger.error(f"Unexpected error during login: {e}")
             return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

@@ -1,0 +1,1667 @@
+swagger: '2.0'
+info:
+  title: Your API Title
+  description: API description
+  version: v1
+host: 127.0.0.1:8000
+schemes:
+- http
+basePath: /
+consumes:
+- application/json
+produces:
+- application/json
+securityDefinitions:
+  Basic:
+    type: basic
+security:
+- Basic: []
+paths:
+  /account/address/:
+    get:
+      operationId: account_address_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Address'
+      tags:
+      - account
+    post:
+      operationId: account_address_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Address'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Address'
+      tags:
+      - account
+    parameters: []
+  /account/address/{id}/:
+    get:
+      operationId: account_address_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Address'
+      tags:
+      - account
+    put:
+      operationId: account_address_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Address'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Address'
+      tags:
+      - account
+    patch:
+      operationId: account_address_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Address'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Address'
+      tags:
+      - account
+    delete:
+      operationId: account_address_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - account
+    parameters:
+    - name: id
+      in: path
+      description: A unique integer value identifying this address.
+      required: true
+      type: integer
+  /account/delete_profile/:
+    get:
+      operationId: account_delete_profile_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    put:
+      operationId: account_delete_profile_update
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    patch:
+      operationId: account_delete_profile_partial_update
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    delete:
+      operationId: account_delete_profile_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - account
+    parameters: []
+  /account/edit_profile/:
+    get:
+      operationId: account_edit_profile_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    put:
+      operationId: account_edit_profile_update
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    patch:
+      operationId: account_edit_profile_partial_update
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    delete:
+      operationId: account_edit_profile_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - account
+    parameters: []
+  /account/login/:
+    post:
+      operationId: account_login_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - account
+    parameters: []
+  /account/logout/:
+    post:
+      operationId: account_logout_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - account
+    parameters: []
+  /account/profile/:
+    get:
+      operationId: account_profile_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    put:
+      operationId: account_profile_update
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    patch:
+      operationId: account_profile_partial_update
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    delete:
+      operationId: account_profile_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - account
+    parameters: []
+  /account/refresh/:
+    post:
+      operationId: account_refresh_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - account
+    parameters: []
+  /account/register/:
+    post:
+      operationId: account_register_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - account
+    parameters: []
+  /account/validate_jwt/:
+    get:
+      operationId: account_validate_jwt_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - account
+    parameters: []
+  /suppliers/categories/:
+    get:
+      operationId: suppliers_categories_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CategorySupplier'
+      tags:
+      - suppliers
+    post:
+      operationId: suppliers_categories_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CategorySupplier'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategorySupplier'
+      tags:
+      - suppliers
+    parameters: []
+  /suppliers/categories/{name}/:
+    get:
+      operationId: suppliers_categories_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategorySupplier'
+      tags:
+      - suppliers
+    put:
+      operationId: suppliers_categories_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CategorySupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategorySupplier'
+      tags:
+      - suppliers
+    patch:
+      operationId: suppliers_categories_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CategorySupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategorySupplier'
+      tags:
+      - suppliers
+    delete:
+      operationId: suppliers_categories_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - suppliers
+    parameters:
+    - name: name
+      in: path
+      description: A unique value identifying this category supplier.
+      required: true
+      type: string
+  /suppliers/colors/:
+    get:
+      operationId: suppliers_colors_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ColorSupplier'
+      tags:
+      - suppliers
+    post:
+      operationId: suppliers_colors_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ColorSupplier'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/ColorSupplier'
+      tags:
+      - suppliers
+    parameters: []
+  /suppliers/colors/{name}/:
+    get:
+      operationId: suppliers_colors_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ColorSupplier'
+      tags:
+      - suppliers
+    put:
+      operationId: suppliers_colors_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ColorSupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ColorSupplier'
+      tags:
+      - suppliers
+    patch:
+      operationId: suppliers_colors_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ColorSupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ColorSupplier'
+      tags:
+      - suppliers
+    delete:
+      operationId: suppliers_colors_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - suppliers
+    parameters:
+    - name: name
+      in: path
+      description: A unique value identifying this color supplier.
+      required: true
+      type: string
+  /suppliers/inventory/:
+    get:
+      operationId: suppliers_inventory_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/InventorySupplier'
+      tags:
+      - suppliers
+    post:
+      operationId: suppliers_inventory_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/InventorySupplier'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/InventorySupplier'
+      tags:
+      - suppliers
+    parameters: []
+  /suppliers/inventory/{id}/:
+    get:
+      operationId: suppliers_inventory_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/InventorySupplier'
+      tags:
+      - suppliers
+    put:
+      operationId: suppliers_inventory_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/InventorySupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/InventorySupplier'
+      tags:
+      - suppliers
+    patch:
+      operationId: suppliers_inventory_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/InventorySupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/InventorySupplier'
+      tags:
+      - suppliers
+    delete:
+      operationId: suppliers_inventory_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - suppliers
+    parameters:
+    - name: id
+      in: path
+      description: A unique integer value identifying this inventory supplier.
+      required: true
+      type: integer
+  /suppliers/products/:
+    get:
+      operationId: suppliers_products_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ProductDetailSupplier'
+      tags:
+      - suppliers
+    post:
+      operationId: suppliers_products_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProductDetailSupplier'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProductDetailSupplier'
+      tags:
+      - suppliers
+    parameters: []
+  /suppliers/products/{name}/:
+    get:
+      operationId: suppliers_products_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProductDetailSupplier'
+      tags:
+      - suppliers
+    put:
+      operationId: suppliers_products_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProductDetailSupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProductDetailSupplier'
+      tags:
+      - suppliers
+    patch:
+      operationId: suppliers_products_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProductDetailSupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProductDetailSupplier'
+      tags:
+      - suppliers
+    delete:
+      operationId: suppliers_products_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - suppliers
+    parameters:
+    - name: name
+      in: path
+      description: A unique value identifying this product detail supplier.
+      required: true
+      type: string
+  /suppliers/sizes/:
+    get:
+      operationId: suppliers_sizes_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SizeSupplier'
+      tags:
+      - suppliers
+    post:
+      operationId: suppliers_sizes_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/SizeSupplier'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/SizeSupplier'
+      tags:
+      - suppliers
+    parameters: []
+  /suppliers/sizes/{name}/:
+    get:
+      operationId: suppliers_sizes_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/SizeSupplier'
+      tags:
+      - suppliers
+    put:
+      operationId: suppliers_sizes_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/SizeSupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/SizeSupplier'
+      tags:
+      - suppliers
+    patch:
+      operationId: suppliers_sizes_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/SizeSupplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/SizeSupplier'
+      tags:
+      - suppliers
+    delete:
+      operationId: suppliers_sizes_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - suppliers
+    parameters:
+    - name: name
+      in: path
+      description: A unique value identifying this size supplier.
+      required: true
+      type: string
+  /suppliers/suppliers/:
+    get:
+      operationId: suppliers_suppliers_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Supplier'
+      tags:
+      - suppliers
+    post:
+      operationId: suppliers_suppliers_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Supplier'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Supplier'
+      tags:
+      - suppliers
+    parameters: []
+  /suppliers/suppliers/{name}/:
+    get:
+      operationId: suppliers_suppliers_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Supplier'
+      tags:
+      - suppliers
+    put:
+      operationId: suppliers_suppliers_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Supplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Supplier'
+      tags:
+      - suppliers
+    patch:
+      operationId: suppliers_suppliers_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Supplier'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Supplier'
+      tags:
+      - suppliers
+    delete:
+      operationId: suppliers_suppliers_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - suppliers
+    parameters:
+    - name: name
+      in: path
+      description: A unique value identifying this supplier.
+      required: true
+      type: string
+  /warehouses/employee_tasks/{id}/:
+    get:
+      operationId: warehouses_employee_tasks_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - warehouses
+    parameters:
+    - name: id
+      in: path
+      required: true
+      type: string
+  /warehouses/employees/:
+    get:
+      operationId: warehouses_employees_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Employee'
+      tags:
+      - warehouses
+    post:
+      operationId: warehouses_employees_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Employee'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Employee'
+      tags:
+      - warehouses
+    parameters: []
+  /warehouses/employees/{id}/:
+    get:
+      operationId: warehouses_employees_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Employee'
+      tags:
+      - warehouses
+    put:
+      operationId: warehouses_employees_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Employee'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Employee'
+      tags:
+      - warehouses
+    patch:
+      operationId: warehouses_employees_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Employee'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Employee'
+      tags:
+      - warehouses
+    delete:
+      operationId: warehouses_employees_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - warehouses
+    parameters:
+    - name: id
+      in: path
+      description: A unique integer value identifying this employee.
+      required: true
+      type: integer
+  /warehouses/purchase-orders/:
+    get:
+      operationId: warehouses_purchase-orders_list
+      description: لیست سفارش‌ها با امکان فیلتر بر اساس تامین‌کننده و انبار
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PurchaseOrderList'
+      tags:
+      - warehouses
+    post:
+      operationId: warehouses_purchase-orders_create
+      description: مجموعه‌ای از عملیات مربوط به سفارش‌های خرید از تامین‌کننده
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PurchaseOrderList'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/PurchaseOrderList'
+      tags:
+      - warehouses
+    parameters: []
+  /warehouses/purchase-orders/create/:
+    post:
+      operationId: warehouses_purchase-orders_create_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - warehouses
+    put:
+      operationId: warehouses_purchase-orders_create_update
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - warehouses
+    delete:
+      operationId: warehouses_purchase-orders_create_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - warehouses
+    parameters: []
+  /warehouses/purchase-orders/{id}/:
+    get:
+      operationId: warehouses_purchase-orders_read
+      description: دریافت جزئیات یک سفارش بر اساس ID
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/PurchaseOrderList'
+        '404':
+          description: Order not found
+      tags:
+      - warehouses
+    put:
+      operationId: warehouses_purchase-orders_update
+      description: مجموعه‌ای از عملیات مربوط به سفارش‌های خرید از تامین‌کننده
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PurchaseOrderList'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/PurchaseOrderList'
+      tags:
+      - warehouses
+    patch:
+      operationId: warehouses_purchase-orders_partial_update
+      description: مجموعه‌ای از عملیات مربوط به سفارش‌های خرید از تامین‌کننده
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PurchaseOrderList'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/PurchaseOrderList'
+      tags:
+      - warehouses
+    delete:
+      operationId: warehouses_purchase-orders_delete
+      description: لغو یک سفارش بر اساس ID
+      parameters: []
+      responses:
+        '204':
+          description: Order successfully cancelled
+        '404':
+          description: Order not found
+      tags:
+      - warehouses
+    parameters:
+    - name: id
+      in: path
+      description: A unique integer value identifying this purchase order from supplier.
+      required: true
+      type: integer
+  /warehouses/purchase-orders/{order_id}/items/{detail_id}/:
+    post:
+      operationId: warehouses_purchase-orders_items_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - warehouses
+    put:
+      operationId: warehouses_purchase-orders_items_update
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - warehouses
+    delete:
+      operationId: warehouses_purchase-orders_items_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - warehouses
+    parameters:
+    - name: order_id
+      in: path
+      required: true
+      type: string
+    - name: detail_id
+      in: path
+      required: true
+      type: string
+  /warehouses/task_for_employees/:
+    get:
+      operationId: warehouses_task_for_employees_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskForEmployee'
+      tags:
+      - warehouses
+    post:
+      operationId: warehouses_task_for_employees_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/TaskForEmployee'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/TaskForEmployee'
+      tags:
+      - warehouses
+    parameters: []
+  /warehouses/task_for_employees/{id}/:
+    get:
+      operationId: warehouses_task_for_employees_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TaskForEmployee'
+      tags:
+      - warehouses
+    put:
+      operationId: warehouses_task_for_employees_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/TaskForEmployee'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TaskForEmployee'
+      tags:
+      - warehouses
+    patch:
+      operationId: warehouses_task_for_employees_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/TaskForEmployee'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TaskForEmployee'
+      tags:
+      - warehouses
+    delete:
+      operationId: warehouses_task_for_employees_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - warehouses
+    parameters:
+    - name: id
+      in: path
+      description: A unique integer value identifying this task for employee.
+      required: true
+      type: integer
+  /warehouses/tasks/:
+    get:
+      operationId: warehouses_tasks_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Task'
+      tags:
+      - warehouses
+    post:
+      operationId: warehouses_tasks_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Task'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Task'
+      tags:
+      - warehouses
+    parameters: []
+  /warehouses/tasks/{id}/:
+    get:
+      operationId: warehouses_tasks_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Task'
+      tags:
+      - warehouses
+    put:
+      operationId: warehouses_tasks_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Task'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Task'
+      tags:
+      - warehouses
+    patch:
+      operationId: warehouses_tasks_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Task'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Task'
+      tags:
+      - warehouses
+    delete:
+      operationId: warehouses_tasks_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - warehouses
+    parameters:
+    - name: id
+      in: path
+      description: A unique integer value identifying this task.
+      required: true
+      type: integer
+  /warehouses/warehouse_employees/{id}/:
+    get:
+      operationId: warehouses_warehouse_employees_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - warehouses
+    parameters:
+    - name: id
+      in: path
+      required: true
+      type: string
+  /warehouses/warehouses/:
+    get:
+      operationId: warehouses_warehouses_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Warehouse'
+      tags:
+      - warehouses
+    post:
+      operationId: warehouses_warehouses_create
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Warehouse'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Warehouse'
+      tags:
+      - warehouses
+    parameters: []
+  /warehouses/warehouses/{name}/:
+    get:
+      operationId: warehouses_warehouses_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Warehouse'
+      tags:
+      - warehouses
+    put:
+      operationId: warehouses_warehouses_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Warehouse'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Warehouse'
+      tags:
+      - warehouses
+    patch:
+      operationId: warehouses_warehouses_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Warehouse'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Warehouse'
+      tags:
+      - warehouses
+    delete:
+      operationId: warehouses_warehouses_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - warehouses
+    parameters:
+    - name: name
+      in: path
+      description: A unique value identifying this warehouse.
+      required: true
+      type: string
+definitions:
+  Address:
+    type: object
+    properties:
+      province:
+        title: Province
+        type: string
+        maxLength: 50
+        x-nullable: true
+      city:
+        title: City
+        type: string
+        maxLength: 50
+        x-nullable: true
+      street:
+        title: Street
+        type: string
+        maxLength: 50
+        x-nullable: true
+      alley:
+        title: Alley
+        type: string
+        maxLength: 50
+        x-nullable: true
+      house_number:
+        title: House number
+        type: string
+        maxLength: 50
+        x-nullable: true
+  CategorySupplier:
+    required:
+    - name
+    type: object
+    properties:
+      name:
+        title: Name
+        type: string
+        maxLength: 255
+        minLength: 1
+  ColorSupplier:
+    required:
+    - name
+    type: object
+    properties:
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+  InventorySupplier:
+    required:
+    - supplier
+    - product
+    - stock
+    - price
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      supplier:
+        title: Supplier
+        type: string
+        minLength: 1
+      product:
+        title: Product
+        type: string
+      stock:
+        title: Stock
+        type: integer
+        maximum: 2147483647
+        minimum: -2147483648
+      colors:
+        title: Colors
+        type: string
+      sizes:
+        title: Sizes
+        type: string
+      weight:
+        title: Weight
+        type: string
+        format: decimal
+        x-nullable: true
+      price:
+        title: Price
+        type: integer
+        maximum: 2147483647
+        minimum: -2147483648
+  ProductDetailSupplier:
+    required:
+    - name
+    - description
+    - categories
+    type: object
+    properties:
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      description:
+        title: Description
+        type: string
+        minLength: 1
+      categories:
+        type: array
+        items:
+          $ref: '#/definitions/CategorySupplier'
+      created_date:
+        title: Created date
+        type: string
+        format: date-time
+        readOnly: true
+  SizeSupplier:
+    required:
+    - name
+    type: object
+    properties:
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+  Supplier:
+    required:
+    - name
+    - phone_number
+    - address
+    type: object
+    properties:
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      phone_number:
+        title: Phone number
+        type: string
+        maxLength: 100
+        minLength: 1
+      address:
+        title: Address
+        type: string
+        maxLength: 100
+        minLength: 1
+      is_active:
+        title: Is active
+        type: boolean
+  Employee:
+    required:
+    - warehouse
+    - name
+    - last_name
+    - phone_number
+    - national_code
+    type: object
+    properties:
+      warehouse:
+        title: Warehouse
+        type: string
+      tasks:
+        type: array
+        items:
+          type: integer
+        readOnly: true
+        uniqueItems: true
+      manager:
+        title: Manager
+        type: integer
+        x-nullable: true
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      last_name:
+        title: Last name
+        type: string
+        maxLength: 100
+        minLength: 1
+      phone_number:
+        title: Phone number
+        type: string
+        maxLength: 100
+        minLength: 1
+      national_code:
+        title: National code
+        type: string
+        maxLength: 100
+        minLength: 1
+      image:
+        title: Image
+        type: string
+        readOnly: true
+        format: uri
+  PurchaseOrderList:
+    required:
+    - expected_delivery_date
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      supplier:
+        title: Supplier
+        type: string
+        readOnly: true
+        minLength: 1
+      warehouse:
+        title: Warehouse
+        type: string
+        readOnly: true
+        minLength: 1
+      order_date:
+        title: Order date
+        type: string
+        format: date
+        readOnly: true
+      expected_delivery_date:
+        title: Expected delivery date
+        type: string
+        format: date
+      total_price_order:
+        title: Total price order
+        type: string
+        format: decimal
+        readOnly: true
+      is_apply_to_inventory:
+        title: Is apply to inventory
+        type: boolean
+        readOnly: true
+  TaskForEmployee:
+    required:
+    - employee
+    - task
+    type: object
+    properties:
+      employee:
+        title: Employee
+        type: integer
+      task:
+        title: Task
+        type: integer
+      was_delivered_at:
+        title: Was delivered at
+        type: string
+        format: date-time
+        readOnly: true
+      is_done:
+        title: Is done
+        type: boolean
+  Task:
+    required:
+    - title
+    type: object
+    properties:
+      title:
+        title: Title
+        type: string
+        maxLength: 100
+        minLength: 1
+      description:
+        title: Description
+        type: string
+        x-nullable: true
+  Warehouse:
+    required:
+    - name
+    - address
+    type: object
+    properties:
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      address:
+        title: Address
+        type: string
+        maxLength: 100
+        minLength: 1
+      date_of_establishment:
+        title: Date of establishment
+        type: string
+        format: date
+        readOnly: true
+      is_full:
+        title: Is full
+        type: boolean
+      slug:
+        title: Slug
+        type: string
+        format: slug
+        pattern: ^[-a-zA-Z0-9_]+$
+        readOnly: true
+        minLength: 1
+        x-nullable: true

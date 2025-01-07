@@ -21,10 +21,9 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
-    image = models.ImageField(upload_to='products/')
-    description = models.TextField()
-    stock = models.IntegerField()
-    score = models.IntegerField()
+    image = models.ImageField(upload_to='products/', null=True,blank=True)
+    description = models.TextField(null=True,blank=True)
+    score = models.IntegerField(null=True, blank=True)
     categories = models.ManyToManyField(Category, related_name='products')
 
     def __str__(self):
@@ -34,8 +33,11 @@ class ProductProperty(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name='properties')
     color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='properties')
-    price = models.FloatField()
-    weight = models.FloatField()
+    buy_price = models.FloatField(null=True, blank=True)
+    sell_price = models.FloatField(null=True, blank=True)
+    weight = models.FloatField(null=True, blank=True)
+    can_sale = models.BooleanField(default=True)
+
     def __str__(self):
         return f'{self.product.name} properties'
 
@@ -49,9 +51,13 @@ class Comment(models.Model):
         return self.title
 
 class ProductRating(models.Model):
-    user = models.IntegerField()
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    rating = models.IntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='ratings')
+    rating = models.IntegerField(null=True,blank=True)
     pub_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user','product')
+        ordering = ['-pub_at']
     def __str__(self):
         return f'{self.user} - {self.product} - {self.rating}'

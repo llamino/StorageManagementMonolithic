@@ -9,7 +9,7 @@ from rest_framework import status
 class SizeSupplierViewSet(ModelViewSet):
     serializer_class = SizeSupplierSerializer
     queryset = SizeSupplier.objects.all()
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
 
     def list(self, request, *args, **kwargs):
         serializer = self.serializer_class(self.queryset, many=True)
@@ -190,7 +190,6 @@ class InventorySupplierViewSet(ModelViewSet):
         serializer = self.serializer_class(object)
         return Response(serializer.data, status=status.HTTP_200_OK)
     def create(self, request, *args, **kwargs):
-        print(f'amin ahmadi {request.data}')
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

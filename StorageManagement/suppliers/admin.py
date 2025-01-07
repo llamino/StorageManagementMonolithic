@@ -88,9 +88,9 @@ class ProductDetailSupplierAdmin(admin.ModelAdmin):
 
 @admin.register(InventorySupplier)
 class InventorySupplierAdmin(admin.ModelAdmin):
-    list_display = ('supplier', 'product', 'colors', 'sizes', 'price')
+    list_display = ('supplier', 'product', 'color', 'size', 'price')
     search_fields = ('supplier', 'product','price')
-    list_filter = ('colors', 'sizes', 'price',PriceRangeFilter)
+    list_filter = ('color', 'size', 'price',PriceRangeFilter)
     ordering = ('supplier', 'product',)
     # inlines = [InventoryColorInline, InventorySizeInline]
 

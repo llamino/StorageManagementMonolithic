@@ -39,8 +39,8 @@ class InventorySupplier(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     product = models.ForeignKey(ProductDetailSupplier, on_delete=models.CASCADE)
     stock = models.IntegerField()
-    colors = models.ForeignKey(ColorSupplier, on_delete=models.RESTRICT, null=True, blank=True)
-    sizes = models.ForeignKey(SizeSupplier, on_delete=models.RESTRICT, null=True, blank=True)
+    color = models.ForeignKey(ColorSupplier, on_delete=models.RESTRICT, null=True, blank=True, related_name='products')
+    size = models.ForeignKey(SizeSupplier, on_delete=models.RESTRICT, null=True, blank=True, related_name='products')
     weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     price = models.IntegerField()
     def __str__(self):

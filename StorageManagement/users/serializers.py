@@ -69,6 +69,9 @@ class AddressSerializer(serializers.ModelSerializer):
         return address
 
 
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True)
 
 class UserProfileSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
