@@ -47,6 +47,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     text = models.TextField()
+    created_date = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.title
 
@@ -54,10 +55,10 @@ class ProductRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
     product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='ratings')
     rating = models.IntegerField(null=True,blank=True)
-    pub_at = models.DateTimeField(auto_now_add=True)
+    rating_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user','product')
-        ordering = ['-pub_at']
+        ordering = ['-rating_date']
     def __str__(self):
         return f'{self.user} - {self.product} - {self.rating}'

@@ -27,39 +27,39 @@ class TaskForEmployeeSerializer(serializers.ModelSerializer):
         fields = ('employee','task','was_delivered_at','is_done')
         read_only_fields = ('was_delivered_at',)
 
-    # def create(self, validated_data):
-    #     employee_data = validated_data.get('employee')
-    #     task_data = validated_data.get('task')
-    #
-    #     if not task_data or employee_data:
-    #         raise serializers.ValidationError({"detail":"task and employee must be entered"})
-    #
-    #     if not Employee.objects.get(id=employee_data).exist():
-    #         raise serializers.ValidationError({"detail":"emplyee does not valid"})
-    #
-    #     task_object, created = Task.objects.get_or_create(id=task_data)
-    #     instance = TaskForEmployee.objects.create(**validated_data)
-    #     return instance
-    #
-    # def update(self, instance, validated_data):
-    #     employee_data = validated_data.get('employee')
-    #     task_data = validated_data.get('task')
-    #
-    #     if employee_data is not None:
-    #         if not Employee.objects.get(id=employee_data).exist():
-    #             raise serializers.ValidationError({"detail": "emplyee does not valid"})
-    #         else:
-    #             instance.employee = employee_data
-    #     if task_data is not None:
-    #         task_object, created = Task.objects.get_or_create(id=task_data)
-    #         instance.task = task_data
-    #     return instance
+    def create(self, validated_data):
+        employee_data = validated_data.get('employee')
+        task_data = validated_data.get('task')
+
+        if not task_data or employee_data:
+            raise serializers.ValidationError({"detail":"task and employee must be entered"})
+
+        if not Employee.objects.get(id=employee_data).exist():
+            raise serializers.ValidationError({"detail":"emplyee does not valid"})
+
+        task_object, created = Task.objects.get_or_create(id=task_data)
+        instance = TaskForEmployee.objects.create(**validated_data)
+        return instance
+
+    def update(self, instance, validated_data):
+        employee_data = validated_data.get('employee')
+        task_data = validated_data.get('task')
+
+        if employee_data is not None:
+            if not Employee.objects.get(id=employee_data).exist():
+                raise serializers.ValidationError({"detail": "emplyee does not valid"})
+            else:
+                instance.employee = employee_data
+        if task_data is not None:
+            task_object, created = Task.objects.get_or_create(id=task_data)
+            instance.task = task_data
+        return instance
 
 class WarehouseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Warehouse
-        fields = ('name','address','date_of_establishment','is_full','slug')
-        read_only_fields = ('date_of_establishment','slug')
+        fields = ('name','address','stablished_date','is_full','slug')
+        read_only_fields = ('stablished_date','slug')
 
 
 class PurchaseOrderItemSerializer(serializers.ModelSerializer):

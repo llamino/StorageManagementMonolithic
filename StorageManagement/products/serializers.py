@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Size,Color,Category,ProductRating,ProductProperty,Product
+from .models import Size,Color,Category,ProductRating,ProductProperty,Product,Comment
+from suppliers.models import Supplier,SizeSupplier,ColorSupplier
+from users.models import User
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
@@ -68,43 +70,7 @@ class ProductSerializer(serializers.ModelSerializer):
         return instance
 
 
-class InventorySupplierSerializer(serializers.ModelSerializer):
-    sizes = serializers.CharField(required=False, allow_blank=True)
-    colors = serializers.CharField(required=False, allow_blank=True)
 
-    class Meta:
-        model = ProductProperty
-        fields = ('id', 'supplier', 'product', 'stock', 'colors', 'sizes', 'weight', 'price')
-
-    def create(self, validated_data):
-        # استخراج داده‌ها
-        supplier_data = validated_data.pop('supplier', None)
-        sizes_data = validated_data.pop('sizes', None)
-        colors_data = validated_data.pop('colors', None)
-
-        # بررسی اینکه supplier حتما وارد شده باشد
-        if not supplier_data:
-            raise serializers.ValidationError({"supplier": "اطلاعات تامین‌کننده الزامی است."})
-
-        # گرفتن یا ایجاد اشیاء
-        supplier_object, created = Supplier.objects.get_or_create(name=supplier_data)
-
-        size_object = None
-        if sizes_data:
-            size_object, created = SizeSupplier.objects.get_or_create(name=sizes_data)
-
-        colors_object = None
-        if colors_data:
-            colors_object, created = ColorSupplier.objects.get_or_create(name=colors_data)
-
-        # ایجاد نمونه جدید
-        instance = InventorySupplier.objects.create(
-            supplier=supplier_object,
-            sizes=size_object,
-            colors=colors_object,
-            **validated_data
-        )
-        return instance
 
     def update(self, instance, validated_data):
         # استخراج داده‌ها
@@ -135,6 +101,26 @@ class InventorySupplierSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+class CommentSerializer(serializers.ModelSerializer):
+    product =
+    class Meta:
+        fields = ['id', 'product', 'user', 'title', 'text', 'created_date']
+        read_only_fields = ['id', 'created_date']
+
+    def validate_product(self,value):
+        try:
+            Product.objects.get(name=value)
+            return value
+        except:
+            raise serializers.ValidationError("product does not exist")
+    def validate_user(self, value):
+        if not User.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("User does not exist.")
+        return value
+
+
+
 
 
 

@@ -7,7 +7,7 @@ from suppliers.models import Supplier, InventorySupplier
 class Warehouse(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
     address = models.CharField(max_length=100)
-    date_of_establishment = models.DateField(auto_now_add=True)
+    stablished_date = models.DateField(auto_now_add=True)
     is_full = models.BooleanField(default=False)
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
 
@@ -71,7 +71,6 @@ class PurchaseOrderFromSupplier(models.Model):
     order_date = models.DateField(auto_now_add=True)
     expected_delivery_date = models.DateField()
     total_price_order = models.DecimalField(max_digits=10, decimal_places=2)
-    is_apply_to_inventory = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.supplier_id} - {self.warehouse} '
