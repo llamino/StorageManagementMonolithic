@@ -40,6 +40,22 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+THIRD_PARTY_APPS = [
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_yasg',
+    'rest_framework_simplejwt.token_blacklist',
+    'celery'
+]
+
+PROJECT_APPS = [
+    'orders',
+    'products',
+    'suppliers',
+    'warehouses',
+    'discounts',
+    'recommendations',
+]
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,17 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
-    'orders',
-    'products',
-    'suppliers',
-    'warehouses',
-    'discounts',
-    'recommendations',
-    'drf_yasg',
-]
+] + THIRD_PARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -98,7 +104,7 @@ WSGI_APPLICATION = 'StorageManagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'StorageManagement',  # نام دیتابیس
+        'NAME': 'storagemanagement',  # نام دیتابیس
         'USER': 'root',  # نام کاربری MySQL
         'PASSWORD': 'Am13810420',  # رمز عبور MySQL
         'HOST': '127.0.0.1',  # اگر از سرور ریموت استفاده می‌کنید، آدرس سرور را قرار دهید
@@ -131,7 +137,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
       'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         # سایر رندررهای مورد نیاز شما
@@ -184,3 +189,16 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',   # بک‌اند پیش‌فرض جنگو
 ]
 
+
+# در settings.py اضافه کن
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': "JWT Authorization header using the Bearer scheme. Example: 'Bearer your_token_here'"
+        }
+    },
+    'USE_SESSION_AUTH': False,  # برای جلوگیری از نمایش فرم login/django
+}

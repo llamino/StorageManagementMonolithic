@@ -1,3 +1,5 @@
+# warehouses/serializers.py
+
 from rest_framework import serializers
 from .models import Task,TaskForEmployee,Employee,Warehouse,Inventory,PurchaseOrderFromSupplier,PurchaseOrderDetails
 from suppliers.serializers import InventorySupplierSerializer
@@ -13,13 +15,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = ('warehouse','tasks','manager','name','last_name','phone_number','national_code','image')
         read_only_fields = ('tasks',)
 
-    # def create(self, validated_data):
-    #     manager_object = validated_data.get('manager')
-    #     try:
-    #         manager = Employee.objects.get(id=manager_object)
-    #     except Employee.DoesNotExist:
-    #         raise serializers.ValidationError('Employee does not exist')
-    #
 
 class TaskForEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -99,9 +94,9 @@ class PurchaseOrderListSerializer(serializers.ModelSerializer):
             'order_date',
             'expected_delivery_date',
             'total_price_order',
-            'is_apply_to_inventory',
+            'is_applied_to_warehouse',
         ]
-        read_only_fields = ['id', 'supplier', 'warehouse', 'order_date', 'total_price_order', 'is_apply_to_inventory']
+        read_only_fields = ['id', 'supplier', 'warehouse', 'order_date', 'total_price_order', 'is_applied_to_warehouse']
 
 
 class PurchaseOrderDetailSerializer(serializers.ModelSerializer):
@@ -121,7 +116,7 @@ class PurchaseOrderDetailSerializer(serializers.ModelSerializer):
             'order_date',
             'expected_delivery_date',
             'total_price_order',
-            'is_apply_to_inventory',
+            'is_applied_to_warehouse',
             'items',
         ]
         read_only_fields = [
@@ -131,7 +126,7 @@ class PurchaseOrderDetailSerializer(serializers.ModelSerializer):
             'order_date',
             'expected_delivery_date',
             'total_price_order',
-            'is_apply_to_inventory',
+            'is_applied_to_warehouse',
             'items',
         ]
 
@@ -149,6 +144,8 @@ class AddProductSerializer(serializers.Serializer):
         if value < 1:
             raise serializers.ValidationError('تعداد وارد شده معتبر نیست')
         return value
+
+
 class UpdateProductSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
     quantity = serializers.IntegerField()

@@ -1,3 +1,5 @@
+# warehouses/views.py
+
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
@@ -11,12 +13,21 @@ from django.db import transaction
 from products.models import Product, ProductProperty, Size, Color, Category
 from suppliers.models import Supplier, InventorySupplier
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
+@swagger_auto_schema(
+    tags=['Tasks'],
+    operation_description="API endpoints for managing warehouse tasks",
+)
 class TaskViewSet(ModelViewSet):
+    """
+    ViewSet for managing warehouse tasks.
+    Provides CRUD operations for Task objects.
+    """
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         serializer = self.serializer_class(self.queryset, many=True)
@@ -48,7 +59,15 @@ class TaskViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@swagger_auto_schema(
+    tags=['Employees'],
+    operation_description="API endpoints for managing warehouse employees",
+)
 class EmployeeViewSet(ModelViewSet):
+    """
+    ViewSet for managing warehouse employees.
+    Provides CRUD operations for Employee objects.
+    """
     serializer_class = EmployeeSerializer
     queryset = Employee.objects.all()
     permission_classes = [IsAuthenticated]
@@ -83,7 +102,15 @@ class EmployeeViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@swagger_auto_schema(
+    tags=['TaskForEmployees'],
+    operation_description="API endpoints for managing tasks assigned to employees",
+)
 class TaskForEmployeeViewSet(ModelViewSet):
+    """
+    ViewSet for managing tasks assigned to employees.
+    Provides CRUD operations for TaskForEmployee objects.
+    """
     serializer_class = TaskForEmployeeSerializer
     queryset = TaskForEmployee.objects.all()
     permission_classes = [IsAuthenticated]
@@ -118,7 +145,14 @@ class TaskForEmployeeViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@swagger_auto_schema(
+    tags=['EmployeeTasks'],
+    operation_description="API endpoint to list all tasks for a specific employee",
+)
 class EmployeeTasks(APIView):
+    """
+    API endpoint to list all tasks for a specific employee.
+    """
     # this functions display the tasks that belong to employee who entered by get method request.
     def get(self, request, pk=None):
         employee = get_object_or_404(Employee, id=pk)
@@ -127,22 +161,44 @@ class EmployeeTasks(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    tags=['Warehouses'],
+    operation_description="API endpoints for managing warehouses",
+)
 class WarehouseViewSet(ModelViewSet):
+    """
+    ViewSet for managing warehouses.
+    Provides CRUD operations for Warehouse objects.
+    """
     queryset = Warehouse.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = WarehouseSerializer
 
 
 class WarehouseEmployees(APIView):
+    """
+    API endpoint to list all employees in a warehouse.
+    7777
+    """
+    @swagger_auto_schema(
+        tags=['warehouses'],
+        operation_description="API endpoint to list all employees in a warehouse",
+        responses={200: EmployeeSerializer(many=True)}
+    )
     def get(self, request, pk=None):
         warehouse = get_object_or_404(Warehouse, slug=pk)
         employees = warehouse.employees.all()
-        seializer = EmployeeSerializer(employees,many=True)
-        return Response(seializer.data, status=status.HTTP_200_OK)
+        serializer = EmployeeSerializer(employees, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-
+@swagger_auto_schema(
+    tags=['PurchaseOrderFromSupplier'],
+    operation_description="API endpoint for creating and deleting purchase orders from suppliers",
+)
 class PurchaseOrderFromSupplierView(APIView):
-
+    """
+    API endpoint for creating and deleting purchase orders from suppliers.
+    """
     # ایجاد سفارش جدید
     def post(self, request):
         try:
@@ -299,9 +355,14 @@ class PurchaseOrderFromSupplierView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    tags=['PurchaseOrders'],
+    operation_description="API endpoints for managing purchase orders",
+)
 class PurchaseOrderViewSet(ModelViewSet):
     """
-    مجموعه‌ای از عملیات مربوط به سفارش‌های خرید از تامین‌کننده
+    ViewSet for managing purchase orders.
+    Provides CRUD operations for PurchaseOrderFromSupplier objects.
     """
     serializer_class = PurchaseOrderListSerializer  # تعریف serializer_class
     queryset = PurchaseOrderFromSupplier.objects.all()  # تعریف queryset پیش‌فرض
@@ -406,7 +467,14 @@ class PurchaseOrderViewSet(ModelViewSet):
         except PurchaseOrderFromSupplier.DoesNotExist:
             return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
 
+@swagger_auto_schema(
+    tags=['ApplyPurchaseToInventory'],
+    operation_description="API endpoint to apply a purchase order to inventory",
+)
 class ApplyPurchaseToInventory(APIView):
+    """
+    API endpoint to apply a purchase order to inventory.
+    """
     def post(self,request, order_id):
         order = get_object_or_404(PurchaseOrderFromSupplier, id=order_id)
         warehouse = order.warehouse
@@ -473,7 +541,14 @@ class ApplyPurchaseToInventory(APIView):
         return Response({'detail': 'Order successfully applied to inventory'}, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    tags=['AddProductToInventory'],
+    operation_description="API endpoint to add a product to warehouse inventory",
+)
 class AddProductToInventory(APIView):
+    """
+    API endpoint to add a product to warehouse inventory.
+    """
     '''
     این کلاس برای افزودن یک یا چند محصول به انبار مشخصه ایجاد شده است.
     ورودی هایی که نیاز است در این کلاس در اختیار داشته باشیم، عبارت است از:
@@ -485,10 +560,8 @@ class AddProductToInventory(APIView):
         """
         دریافت یک لیست از محصولات و تعداد آنها و افزودن به انبار مشخص.
         """
-        # اعتبارسنجی انبار
         warehouse = get_object_or_404(Warehouse, name=warehouse_name)
 
-        # اعتبارسنجی داده‌های ورودی
         serializer = AddProductSerializer(data=request.data, many=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -519,7 +592,14 @@ class AddProductToInventory(APIView):
         except Exception as e:
             return Response({"detail": "خطایی رخ داد.", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@swagger_auto_schema(
+    tags=['UpdateProductInventory'],
+    operation_description="API endpoint to update a product in warehouse inventory",
+)
 class UpdateProductInventory(APIView):
+    """
+    API endpoint to update a product in warehouse inventory.
+    """
     '''
     این کلاس برای بروز رسانی موجودی یک محصول در انبار مشخصه ایجاد شده است.
     ورودی هایی که نیاز است عبارتند از:
@@ -568,7 +648,14 @@ class UpdateProductInventory(APIView):
             return Response({"detail": "خطایی رخ داد.", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    tags=['DeleteProductFromInventory'],
+    operation_description="API endpoint to delete a product from warehouse inventory",
+)
 class DeleteProductFromInventory(APIView):
+    """
+    API endpoint to delete a product from warehouse inventory.
+    """
     '''
     این کلاس برای حذف یک محصول از انبار مشخصه ایجاد شده است.
     ورودی هایی که نیاز است عبارتند از:
@@ -602,28 +689,25 @@ class DeleteProductFromInventory(APIView):
 
 
 class TransmitWarehouseProduct(APIView):
-    '''
-    این کلاس برای انتقال محصول بین دو انبار ایجاد شده است
-    برای ورودی این تابع میتوان از الگوی زیر استفاده کرد
-    {
-      {
-        product_id = ...
-        quantity = ...
-      }
-      {
-        product_id = ...
-        quantity = ...
-      }
-      .
-      .
-      .
-    }
+    """
+    API endpoint to transmit a product between warehouses.
+    """
 
-    '''
-    def post(self,request,origin_warehouse_name,destination_warehouse_name):
-        origin_warehouse = get_object_or_404(Warehouse,name=origin_warehouse_name)
-        destination_warehouse = get_object_or_404(Warehouse,name=destination_warehouse_name)
-        serializer = AddProductSerializer(request.data, many=True)
+    @swagger_auto_schema(
+        tags=['warehouses'],
+        operation_description="API endpoint to transmit a product between warehouses",
+        request_body=AddProductSerializer(many=True)
+    )
+    def post(self, request, origin_warehouse_name, destination_warehouse_name):
+        origin_warehouse = get_object_or_404(Warehouse, name=origin_warehouse_name)
+        destination_warehouse = get_object_or_404(Warehouse, name=destination_warehouse_name)
+        raw_data = request.data
+        if isinstance(raw_data, dict) and "data" in raw_data:
+            data = raw_data["data"]
+        else:
+            data = raw_data
+
+        serializer = AddProductSerializer(data=data, many=True)
         serializer.is_valid(raise_exception=True)
         products = serializer.validated_data
         try:
@@ -636,23 +720,18 @@ class TransmitWarehouseProduct(APIView):
                         raise ValueError('انبار مبدا،‌ محصول مورد نظر را ندارد')
                     if origin_inventory.stock < item['quantity']:
                         raise ValueError(f'تعدادی که وارد کردید، از موجودی محصول {item} بیشتر است ')
-                    destination_inventory, created = Inventory.objects.get_or_create(warehouse=destination_warehouse,product=product)
+                    destination_inventory, created = Inventory.objects.get_or_create(warehouse=destination_warehouse, product=product)
                     if created:
                         destination_inventory.stock = item['quantity']
                     else:
                         destination_inventory.stock += item['quantity']
                     origin_inventory.stock -= item['quantity']
-                    # به‌روزرسانی همزمان
-                    Inventory.objects.bulk_update(
-                        [destination_inventory, origin_inventory], ["stock"]
-                    )
-                    # به‌روزرسانی همزمان
                     Inventory.objects.bulk_update(
                         [destination_inventory, origin_inventory], ["stock"]
                     )
                 return Response({"detail": "محصولات با موفقیت به انبار اضافه شدند."}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"detail": "خطایی رخ داد.", "error": str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"detail": "خطایی رخ داد.", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

@@ -1,3 +1,5 @@
+# warehouses/admin.py
+
 from django.contrib import admin
 from .models import Inventory,TaskForEmployee, Employee,Warehouse,PurchaseOrderFromSupplier,PurchaseOrderDetails,Task
 
@@ -59,7 +61,7 @@ class PurchaseOrderDetailsAdmin(admin.ModelAdmin):
 
 @admin.register(TaskForEmployee)
 class TaskForEmployeeAdmin(admin.ModelAdmin):
-    list_display = ['employee','task','get_warehouse','was_delivered_at']
+    list_display = ['employee','task','get_warehouse','was_delivered_at', 'is_done']
     def get_warehouse(self,obj):
         #This function displays the warehouse that belongs to an employee who has been assigned a task.
         return obj.employee.warehouse

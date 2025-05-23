@@ -1,3 +1,4 @@
+# StorageManagement/urls.py
 """
 URL configuration for StorageManagement project.
 
@@ -23,17 +24,30 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+# تعریف امنیت Bearer Token به سبک drf_yasg
 schema_view = get_schema_view(
     openapi.Info(
-        title="Your API Title",
-        default_version="v1",
-        description="API description",
+        title="Storage Management API",
+        default_version='v1',
+        description="...",
+        contact=openapi.Contact(email="contact@example.com"),
+        license=openapi.License(name="BSD License"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
+    authentication_classes=[],  # بسته به نیازت می‌تونی اینو ست کنی
 )
 
-
+swagger_ui_settings = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"',
+        }
+    }
+}
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include('users.urls')),
@@ -45,8 +59,3 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
-
-
-

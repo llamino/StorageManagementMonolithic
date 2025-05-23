@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import Size,Color,Category,ProductRating,ProductProperty,Product,Comment
 from suppliers.models import Supplier,SizeSupplier,ColorSupplier
 from users.models import User
+
+
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
@@ -22,7 +24,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['name', 'description', 'categories', 'created_date']
+        fields = ['name', 'description', 'categories', 'create_date']
 
     def create(self, validated_data):
         # استخراج دسته‌بندی‌ها از داده‌های معتبر
@@ -103,8 +105,9 @@ class ProductSerializer(serializers.ModelSerializer):
         return instance
 
 class CommentSerializer(serializers.ModelSerializer):
-    product =
+    # product =
     class Meta:
+        model = Comment
         fields = ['id', 'product', 'user', 'title', 'text', 'created_date']
         read_only_fields = ['id', 'created_date']
 
@@ -114,6 +117,8 @@ class CommentSerializer(serializers.ModelSerializer):
             return value
         except:
             raise serializers.ValidationError("product does not exist")
+
+
     def validate_user(self, value):
         if not User.objects.filter(id=value.id).exists():
             raise serializers.ValidationError("User does not exist.")
