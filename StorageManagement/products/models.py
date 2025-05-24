@@ -34,8 +34,8 @@ class Product(models.Model):
 
 class ProductProperty(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name='properties')
-    color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='properties')
+    size = models.ForeignKey(Size, on_delete=models.SET_NULL, related_name='properties', null=True, blank=True)
+    color = models.ForeignKey(Color, on_delete=models.SET_NULL, related_name='properties', null=True, blank=True)
     buy_price = models.FloatField(null=True, blank=True)
     sell_price = models.FloatField(null=True, blank=True)
     weight = models.FloatField(null=True, blank=True)
@@ -44,13 +44,17 @@ class ProductProperty(models.Model):
     def __str__(self):
         return f'{self.product.name} properties'
 
+    class Meta:
+        unique_together = ('product', 'size', 'color')
+
 
 class Comment(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='comments', null=True, blank=True)
     title = models.CharField(max_length=100)
-    text = models.TextField()
+    text = models.TextField(null=True,blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return self.title
 

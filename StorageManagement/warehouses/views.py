@@ -469,23 +469,55 @@ class PurchaseOrderViewSet(ModelViewSet):
 
 @swagger_auto_schema(
     tags=['ApplyPurchaseToInventory'],
-    operation_description="API endpoint to apply a purchase order to inventory",
+    operation_description="Apply a specific purchase order to the warehouse inventory. "
+                          "This transfers the ordered items to the warehouse, updates inventory stock, "
+                          "and marks the order as applied. If already applied, it will return an error.",
+    manual_parameters=[
+        openapi.Parameter(
+            'order_id',
+            openapi.IN_PATH,
+            description="ID of the purchase order to apply",
+            type=openapi.TYPE_INTEGER,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response('Order successfully applied to inventory', schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'detail': openapi.Schema(type=openapi.TYPE_STRING)
+            }
+        )),
+        400: openapi.Response('Bad Request – Order already applied or supplier stock insufficient'),
+        404: openapi.Response('Not Found – Order ID does not exist'),
+        500: openapi.Response('Server Error – Unexpected exception')
+    }
 )
 class ApplyPurchaseToInventory(APIView):
     """
     API endpoint to apply a purchase order to inventory.
     """
-    def post(self,request, order_id):
+
+    def post(self, request, order_id):
         order = get_object_or_404(PurchaseOrderFromSupplier, id=order_id)
         warehouse = order.warehouse
         items = order.products.all()
+
         if order.is_applied_to_warehouse:
-            return Response({'detail': 'This order has already been applied to a warehouse.'},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'This order has already been applied to a warehouse.'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             with transaction.atomic():
                 for item in items:
                     quantity = item.quantity_ordered
                     supplier_product = item.product_in_supplier
+
+                    # کاهش موجودی تأمین‌کننده
+                    if supplier_product.stock < quantity:
+                        return Response({'detail': 'Supplier stock is not sufficient.'}, status=status.HTTP_400_BAD_REQUEST)
+                    supplier_product.stock -= quantity
+                    supplier_product.save()
+
                     supplier_product_detail = supplier_product.product
                     supplier_product_color = supplier_product.color.name
                     supplier_product_size = supplier_product.size.name
@@ -496,49 +528,58 @@ class ApplyPurchaseToInventory(APIView):
                     supplier_product_categories = supplier_product_detail.categories.all()
 
                     for category in supplier_product_categories:
-                        if Category.objects.filter(name=category.name).exists():
-                            continue
-                        else:
-                            Category.objects.create(name=category.name)
+                        Category.objects.get_or_create(name=category.name)
+
                     product_obj, created = Product.objects.get_or_create(
                         name=supplier_product_name,
                         defaults={'description': supplier_product_description}
                     )
+
                     if created:
                         product_obj.categories.set(
-                            [Category.objects.get(name=cat.name) for cat in supplier_product_categories])
+                            [Category.objects.get(name=cat.name) for cat in supplier_product_categories]
+                        )
+
                     color_obj, _ = Color.objects.get_or_create(name=supplier_product_color)
                     size_obj, _ = Size.objects.get_or_create(name=supplier_product_size)
-                    try:
-                        product_property = ProductProperty.objects.get(
-                            product=product_obj,
-                            color=color_obj,
-                            size=size_obj
-                        )
+
+                    product_property, _ = ProductProperty.objects.get_or_create(
+                        product=product_obj,
+                        color=color_obj,
+                        size=size_obj,
+                        defaults={
+                            'weight': supplier_product_weight,
+                            'buy_price': supplier_product_price
+                        }
+                    )
+
+                    # در صورتی که از قبل وجود داشته باشد، ویژگی‌ها را به‌روز کنیم
+                    if not _:
                         product_property.weight = supplier_product_weight
                         product_property.buy_price = supplier_product_price
                         product_property.save()
-                    except ProductProperty.DoesNotExist:
 
-                        product_property = ProductProperty.objects.create(
-                            product=product_obj,
-                            color=color_obj,
-                            size=size_obj,
-                            buy_price=supplier_product_price,
-                            weight=supplier_product_weight
-                        )
-                    product_in_inventory, created = Inventory.objects.get_or_create(warehouse=warehouse,product=product_property)
+                    inventory_obj, created = Inventory.objects.get_or_create(
+                        warehouse=warehouse,
+                        product=product_property
+                    )
+
                     if created:
-                        product_in_inventory.stock = quantity
+                        inventory_obj.stock = quantity
                     else:
-                        product_in_inventory.stock += quantity
-                    product_in_inventory.save()
-            order.is_applied_to_warehouse = True
-            order.save()
+                        inventory_obj.stock += quantity
+
+                    inventory_obj.save()
+
+                # به‌روزرسانی وضعیت سفارش
+                order.is_applied_to_warehouse = True
+                order.save()
+
         except Exception as e:
             return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'detail': 'Order successfully applied to inventory'}, status=status.HTTP_200_OK)
+
 
 
 @swagger_auto_schema(
@@ -667,13 +708,10 @@ class DeleteProductFromInventory(APIView):
         """
         حذف یک محصول از انبار مشخص.
         """
-        # اعتبارسنجی انبار
         warehouse = get_object_or_404(Warehouse, name=warehouse_name)
 
-        # اعتبارسنجی محصول
         product = get_object_or_404(ProductProperty, id=product_id)
 
-        # حذف موجودی
         try:
             inventory = Inventory.objects.filter(warehouse=warehouse, product=product).first()
             if inventory:

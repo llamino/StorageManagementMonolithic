@@ -5,10 +5,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 from rest_framework import status, generics
 from .models import Color,Size,Category,ProductProperty,Product,ProductRating, Comment
-from .serializers import CommentSerializer, SizeSerializer,ColorSerializer,CategorySerializer,ProductSerializer
+from .serializers import CommentSerializer, SizeSerializer,ColorSerializer,CategorySerializer,ProductSerializer, ProductPropertySerializer
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.db import transaction
+
 
 @swagger_auto_schema(
     tags=['Colors'],
@@ -113,6 +115,68 @@ class CommentView(generics.ListCreateAPIView, generics.DestroyAPIView):
         comment_id = self.kwargs['comment_id']
         comment = Comment.objects.filter(id=comment_id, product__name=product_name, user=request.user).first()
         if not comment:
-            raise NotFound("Comment not found or you do not have permission to delete it.")
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class AddProductPropertyApiView(APIView):
+    @swagger_auto_schema(
+        tags=['Products'],
+        operation_description="Add product property",
+        request_body=ProductPropertySerializer,
+        responses={200: ProductPropertySerializer()}
+    )
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        try:
+            size_name = data.get('size', {}).get('name') if data.get('size') else None
+            color_name = data.get('color', {}).get('name') if data.get('color') else None
+            product_name = data.get('product', {}).get('name')
+
+            weight = data.get('weight')
+            can_sale = data.get('can_sale')
+            buy_price = data.get('buy_price')
+            sell_price = data.get('sell_price')
+
+            with transaction.atomic():
+                size = None
+                color = None
+
+                if size_name:
+                    size, _ = Size.objects.get_or_create(name=size_name)
+
+                if color_name:
+                    color, _ = Color.objects.get_or_create(name=color_name)
+
+                product, created = Product.objects.get_or_create(name=product_name)
+
+                if created:
+                    product_info = data.get('product')
+                    product.description = product_info.get('description') if product_info else None
+                    categories = product_info.get('categories', [])
+                    for category_name in categories:
+                        if category_name:
+                            category, _ = Category.objects.get_or_create(name=category_name)
+                            product.categories.add(category)
+                    product.save()
+                    product.save()
+
+                product_property = ProductProperty.objects.create(
+                    product=product,
+                    size=size,
+                    color=color,
+                    weight=weight,
+                    can_sale=can_sale,
+                    buy_price=buy_price,
+                    sell_price=sell_price
+                )
+
+                serializer = ProductPropertySerializer(product_property)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+

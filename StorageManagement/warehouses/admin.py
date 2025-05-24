@@ -47,11 +47,17 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 @admin.register(PurchaseOrderFromSupplier)
-class PurchaseOrderFromSupplierAdmin(admin.ModelAdmin):
-    list_display = ['supplier','warehouse','id','total_price_order']
-    list_filter = ['supplier','warehouse']
-    verbose_name_plural = 'Purchase Orders'
+class PurchaseOrderAdmin(admin.ModelAdmin):
+    list_display = ('supplier', 'warehouse', 'order_date', 'is_applied_to_warehouse')
+    actions = ['apply_to_inventory']
 
+    def apply_to_inventory(self, request, queryset):
+        for order in queryset:
+            from .views import ApplyPurchaseToInventory
+            view = ApplyPurchaseToInventory()
+            response = view.post(request, order.id)
+            self.message_user(request, f"Applied order {order.id} to inventory: {response.data.get('detail')}")
+    apply_to_inventory.short_description = "Apply selected orders to inventory"
 
 @admin.register(PurchaseOrderDetails)
 class PurchaseOrderDetailsAdmin(admin.ModelAdmin):

@@ -14,7 +14,7 @@ class ColorSerializer(serializers.ModelSerializer):
         model = Color
         fields = ('name',)
 
-class CategorySerializer(serializers.Serializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('name',)
@@ -124,6 +124,15 @@ class CommentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("User does not exist.")
         return value
 
+
+class ProductPropertySerializer(serializers.ModelSerializer):
+    color = ColorSerializer(required=False,allow_null=True)
+    size = SizeSerializer(required=False,allow_null=True)
+    product = ProductSerializer()
+    class Meta:
+        model = ProductProperty
+        fields = ['id','product','size','color','buy_price','sell_price','weight','can_sale']
+        read_only_fields =['id']
 
 
 
