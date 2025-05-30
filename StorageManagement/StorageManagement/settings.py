@@ -1,3 +1,4 @@
+# StorageManagement/settings.py
 """
 Django settings for StorageManagement project.
 
@@ -45,12 +46,15 @@ THIRD_PARTY_APPS = [
     'rest_framework_simplejwt',
     'drf_yasg',
     'rest_framework_simplejwt.token_blacklist',
-    'celery'
+    'celery',
+    'dal',
+    'dal_select2',
+    'django_celery_beat',
 ]
 
 PROJECT_APPS = [
-    'orders',
-    'products',
+    'orders.apps.OrdersConfig',
+    'products.apps.ProductsConfig', 
     'suppliers',
     'warehouses',
     'discounts',
@@ -132,14 +136,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',  # ✅ اضافه شود
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-      'DEFAULT_RENDERER_CLASSES': (
+    'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        # سایر رندررهای مورد نیاز شما
     ),
 }
 
@@ -191,14 +195,59 @@ AUTHENTICATION_BACKENDS = [
 
 
 # در settings.py اضافه کن
+
+# تنظیمات drf-yasg
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
-            'in': 'header',
             'name': 'Authorization',
-            'description': "JWT Authorization header using the Bearer scheme. Example: 'Bearer your_token_here'"
+            'in': 'header',
+            'description': 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"'
         }
     },
-    'USE_SESSION_AUTH': False,  # برای جلوگیری از نمایش فرم login/django
+    'USE_SESSION_AUTH': False,
+    'JSON_EDITOR': True,
+    'SUPPORTED_SUBMIT_METHODS': [
+        'get',
+        'post', 
+        'put',
+        'delete',
+        'patch'
+    ],
+    'OPERATIONS_SORTER': 'alpha',
+    'TAGS_SORTER': 'alpha',
+    'DOC_EXPANSION': 'none',
+    'DEEP_LINKING': True,
+    'SHOW_EXTENSIONS': True,
+    'DEFAULT_MODEL_RENDERING': 'model',
 }
+
+# تنظیمات Redoc
+REDOC_SETTINGS = {
+    'LAZY_RENDERING': False,
+    'HIDE_HOSTNAME': False,
+    'EXPAND_RESPONSES': 'all',
+}
+
+# Celery Configuration Options
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_DEFAULT_QUEUE = 'default'
+CELERY_TASK_DEFAULT_EXCHANGE = 'default'
+CELERY_TASK_DEFAULT_ROUTING_KEY = 'default'
+
+# Celery Beat Settings
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_MAX_LOOP_INTERVAL = 300  # 5 minutes
+
+# django-autocomplete-light settings
+AUTOLOAD_SELECT2 = True
+SELECT2_CACHE_BACKEND = 'default'
+SELECT2_CACHE_PREFIX = 'select2_'

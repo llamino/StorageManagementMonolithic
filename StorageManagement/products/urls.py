@@ -21,3 +21,5 @@ urlpatterns =[
     # افزودن یک محصول با تمام جزئیات مانند رنگ و سایز و قیمت و غیره
     path('create_product-property/', views.AddProductPropertyApiView.as_view(),name='create-product-property'),
 ] + router.urls
+
+

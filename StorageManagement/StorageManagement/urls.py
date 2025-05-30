@@ -1,19 +1,6 @@
 # StorageManagement/urls.py
 """
 URL configuration for StorageManagement project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
 from django.urls import path, include
@@ -24,38 +11,64 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-# تعریف امنیت Bearer Token به سبک drf_yasg
+# تعریف schema_view با تنظیمات کامل امنیتی
 schema_view = get_schema_view(
     openapi.Info(
         title="Storage Management API",
         default_version='v1',
-        description="...",
+        description="مدیریت انبار - سیستم جامع مدیریت محصولات، سفارشات و انبار",
         contact=openapi.Contact(email="contact@example.com"),
         license=openapi.License(name="BSD License"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
-    authentication_classes=[],  # بسته به نیازت می‌تونی اینو ست کنی
+    authentication_classes=[],
+    # اضافه کردن تنظیمات امنیتی مستقیماً در اینجا
 )
 
-swagger_ui_settings = {
+# تنظیمات Swagger UI
+swagger_settings = {
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header',
-            'description': 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"',
+            'description': 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"'
         }
-    }
+    },
+    'USE_SESSION_AUTH': False,
+    'JSON_EDITOR': True,
+    'SUPPORTED_SUBMIT_METHODS': [
+        'get',
+        'post',
+        'put',
+        'delete',
+        'patch'
+    ],
+    'OPERATIONS_SORTER': 'alpha',
+    'TAGS_SORTER': 'alpha',
+    'DOC_EXPANSION': 'none',
+    'DEEP_LINKING': True,
+    'SHOW_EXTENSIONS': True,
+    'DEFAULT_MODEL_RENDERING': 'model',
 }
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('account/', include('users.urls')),
-    path('suppliers/', include('suppliers.urls')),
-    path('warehouses/',include('warehouses.urls')),
-    path('products/',include('products.urls')),
+    path('api/account/', include('users.urls')),
+    path('api/suppliers/', include('suppliers.urls')),
+    path('api/warehouses/', include('warehouses.urls')),
+    path('api/products/', include('products.urls')),
+    path('api/orders/', include('orders.urls')),
+    path('api/discounts/', include('discounts.urls')),
+
+    # Swagger URLs
     path('swagger/output.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# اضافه کردن فایل‌های media در حالت debug
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
