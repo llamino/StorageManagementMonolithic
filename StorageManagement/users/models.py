@@ -97,19 +97,13 @@ class Address(models.Model):
     house_number = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
-        return f'{self.user.email} {self.id}'
+        return f'{self.user.email} - id= {self.id} province={self.province} city={self.city} street={self.street}'
 
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, created, **kwargs):
     #This signal has been created for build a profile model for each User
     if created:
         Profile.objects.get_or_create(user=instance)
-
-# @receiver(post_save, sender=User)
-# def save_profile(sender, instance, created, **kwargs):
-#     if created:
-#         Profile = apps.get_model('users', 'Profile')
-#         Profile.objects.get_or_create(user=instance)
 
 
 
