@@ -2,6 +2,8 @@
 
 from django.db import models
 from products.models import Product
+from users.models import User
+
 
 class AssociationRule(models.Model):
     support = models.FloatField(verbose_name="پشتیبانی")
@@ -46,3 +48,12 @@ class RuleProduct(models.Model):
     def __str__(self):
         role = "مقدم" if self.is_antecedent else "نتیجه"
         return f"{self.product.name} ({role}) در قانون {self.rule.id}"
+
+
+class UserRecommendation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    data = models.JSONField()
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.email

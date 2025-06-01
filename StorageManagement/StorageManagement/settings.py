@@ -58,7 +58,7 @@ PROJECT_APPS = [
     'suppliers',
     'warehouses',
     'discounts',
-    'recommendations',
+    'recommendations.apps.RecommendationsConfig',
 ]
 INSTALLED_APPS = [
     'django.contrib.admin',

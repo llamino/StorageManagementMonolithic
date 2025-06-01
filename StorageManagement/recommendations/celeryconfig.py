@@ -19,4 +19,9 @@ beat_schedule = {
         'schedule': crontab(hour='*/1'),  # Run every hour
         'options': {'queue': 'recommendations'}
     },
+    'frequent_pattern_mining': {
+        'task': 'recommendations.tasks.frequent_pattern_mining',
+        'schedule': crontab(hour='*/24'),
+        'options': {'queue': 'recommendations'}
+    }
 } 

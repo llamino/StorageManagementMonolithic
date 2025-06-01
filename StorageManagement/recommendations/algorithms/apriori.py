@@ -10,27 +10,26 @@ from products.models import Product
 
 
 def generateCandidate(itemsets, k):
-    """Generate candidate k-itemsets from the given itemsets."""
+    """تولید مجموعه‌های کاندید k-آیتمی از آیتم‌ست‌های قبلی"""
     candidates = []
     itemsets = [set(itemset) for itemset in itemsets]
 
     for i in range(len(itemsets)):
         for j in range(i + 1, len(itemsets)):
-            # Union of two itemsets
+            # اجتماع دو آیتم‌ست
             candidate = itemsets[i] | itemsets[j]
             if len(candidate) == k:
                 candidate_tuple = tuple(sorted(candidate))
                 if candidate_tuple not in candidates:
-                    # Check if all (k-1) subsets are frequent
+                    # بررسی اینکه همه زیرمجموعه‌های (k-1) آیتمی در لیست آیتم‌ست‌ها هستند
                     subsets = list(itertools.combinations(candidate_tuple, k - 1))
-                    if all(tuple(sorted(subset)) in [tuple(sorted(itemset)) for itemset in itemsets] for subset in
-                           subsets):
+                    if all(tuple(sorted(subset)) in [tuple(sorted(itemset)) for itemset in itemsets] for subset in subsets):
                         candidates.append(candidate_tuple)
     return candidates
 
 
 def calculateItemsetSupport(itemsets, transactions):
-    """Calculate the support count of each itemset in the transactions."""
+    """محاسبه تعداد پشتیبانی هر آیتم‌ست در تراکنش‌ها"""
     itemset_support = {}
 
     for itemset in itemsets:
@@ -48,7 +47,7 @@ def calculateItemsetSupport(itemsets, transactions):
 
 
 def removeItemset(itemsets_support, min_support):
-    """Remove itemsets that do not meet the minimum support threshold."""
+    """حذف آیتم‌ست‌هایی که پشتیبانی کافی ندارند"""
     frequent_itemsets = []
     for itemset, support in itemsets_support.items():
         if support >= min_support:
@@ -57,11 +56,11 @@ def removeItemset(itemsets_support, min_support):
 
 
 def calculateLift(antecedent_support, consequent_support, rule_support, total_transactions):
-    """Calculate lift for association rule."""
+    """محاسبه معیار Lift برای قانون انجمنی"""
     if antecedent_support == 0 or consequent_support == 0:
         return 0
 
-    # Convert counts to probabilities
+    # محاسبه احتمال‌ها
     prob_antecedent = antecedent_support / total_transactions
     prob_consequent = consequent_support / total_transactions
     prob_rule = rule_support / total_transactions
@@ -75,23 +74,23 @@ def calculateLift(antecedent_support, consequent_support, rule_support, total_tr
 
 
 def generateAssociationRules(frequent_itemsets_with_support, transactions, min_conf):
-    """Generate association rules from frequent itemsets based on minimum confidence."""
+    """تولید قوانین انجمنی با حداقل اعتماد مشخص‌شده"""
     rules = []
     total_transactions = len(transactions)
 
-    # Create a lookup for frequent itemsets support
+    # ایجاد دیکشنری lookup برای پشتیبانی آیتم‌ست‌ها
     frequent_lookup = {}
     for itemsets_list in frequent_itemsets_with_support:
         for itemset, support in itemsets_list.items():
             frequent_lookup[itemset] = support
 
-    # Generate rules from itemsets with length >= 2
+    # تولید قوانین از آیتم‌ست‌هایی با طول حداقل ۲
     for itemsets_list in frequent_itemsets_with_support:
         for itemset, itemset_support in itemsets_list.items():
             if len(itemset) < 2:
                 continue
 
-            # Generate all possible antecedent-consequent pairs
+            # تولید تمام ترکیب‌های ممکن مقدم و تالی
             for i in range(1, len(itemset)):
                 for antecedent in itertools.combinations(itemset, i):
                     antecedent = tuple(sorted(antecedent))
@@ -100,20 +99,19 @@ def generateAssociationRules(frequent_itemsets_with_support, transactions, min_c
                     if not consequent:
                         continue
 
-                    # Get supports
+                    # گرفتن پشتیبانی‌ها
                     antecedent_support = frequent_lookup.get(antecedent, 0)
                     consequent_support = frequent_lookup.get(consequent, 0)
 
-                    # Calculate confidence
+                    # محاسبه اعتماد
                     if antecedent_support > 0:
                         confidence = itemset_support / antecedent_support
                     else:
                         confidence = 0
 
+                    # بررسی اینکه اعتماد از حداقل مقدار بیشتر باشد
                     if confidence >= min_conf:
-                        # Calculate lift
-                        lift = calculateLift(antecedent_support, consequent_support,
-                                             itemset_support, total_transactions)
+                        lift = calculateLift(antecedent_support, consequent_support, itemset_support, total_transactions)
 
                         rules.append({
                             'antecedent': antecedent,
@@ -130,10 +128,10 @@ def generateAssociationRules(frequent_itemsets_with_support, transactions, min_c
 
 
 def apriori(transactions, unique_items, max_k, min_support):
-    """Apriori algorithm for frequent itemset generation."""
+    """اجرای الگوریتم Apriori برای یافتن آیتم‌ست‌های پرتکرار"""
     print(f"Starting Apriori with {len(transactions)} transactions, {len(unique_items)} unique items")
 
-    # Generate 1-itemsets
+    # ایجاد آیتم‌ست‌های تک‌عنصری
     itemsets_1 = [(item,) for item in unique_items]
     itemsets_1_support = calculateItemsetSupport(itemsets_1, transactions)
     frequent_1 = removeItemset(itemsets_1_support, min_support)
@@ -143,12 +141,11 @@ def apriori(transactions, unique_items, max_k, min_support):
     all_frequent_itemsets = [{itemset: itemsets_1_support[itemset] for itemset in frequent_1}]
     current_frequent = frequent_1
 
-    # Generate k-itemsets (k >= 2)
+    # ایجاد آیتم‌ست‌های با طول بیشتر
     for k in range(2, max_k + 1):
         if not current_frequent:
             break
 
-        # Generate candidates
         candidates = generateCandidate(current_frequent, k)
 
         if not candidates:
@@ -156,10 +153,7 @@ def apriori(transactions, unique_items, max_k, min_support):
 
         print(f"Generated {len(candidates)} candidate {k}-itemsets")
 
-        # Calculate support for candidates
         candidate_support = calculateItemsetSupport(candidates, transactions)
-
-        # Remove infrequent itemsets
         frequent_k = removeItemset(candidate_support, min_support)
 
         if not frequent_k:
@@ -174,20 +168,20 @@ def apriori(transactions, unique_items, max_k, min_support):
 
 
 def extract_frequent_patterns(min_support=0.01, min_confidence=0.5, max_k=3):
-    """Extract frequent patterns from order data and save to database."""
+    """استخراج الگوهای پرتکرار و ذخیره در پایگاه داده"""
     csv_file_path = 'recommendations/data/order_items_data.csv'
 
     try:
-        # Load and preprocess data
+        # بارگذاری داده‌ها
         print("Loading data...")
         data = pd.read_csv(csv_file_path)
 
-        # Group products by order_id to create transactions
+        # ایجاد تراکنش‌ها بر اساس order_id
         print("Creating transactions...")
         transactions_df = data.groupby('order_id')['product_name'].apply(list).reset_index()
         transactions = transactions_df['product_name'].tolist()
 
-        # Remove empty transactions and clean data
+        # حذف تراکنش‌های خالی
         transactions = [
             [item.strip() for item in transaction if item and str(item).strip() != 'nan']
             for transaction in transactions if transaction
@@ -196,7 +190,7 @@ def extract_frequent_patterns(min_support=0.01, min_confidence=0.5, max_k=3):
 
         print(f"Created {len(transactions)} transactions")
 
-        # Get unique items
+        # یافتن محصولات یکتا
         unique_items = set()
         for transaction in transactions:
             unique_items.update(transaction)
@@ -204,41 +198,40 @@ def extract_frequent_patterns(min_support=0.01, min_confidence=0.5, max_k=3):
 
         print(f"Found {len(unique_items)} unique products")
 
-        # Set parameters
-        min_support = max(1, len(transactions) * 0.01)  # At least 1% support
-        max_k = 3  # Maximum itemset size
-        min_confidence = 0.5  # Minimum confidence for rules
+        # تنظیم پارامترها
+        min_support = max(1, len(transactions) * 0.01)
+        max_k = 3
+        min_confidence = 0.5
 
         print(f"Parameters: min_support={min_support}, max_k={max_k}, min_confidence={min_confidence}")
 
-        # Run Apriori algorithm
+        # اجرای الگوریتم Apriori
         print("Running Apriori algorithm...")
         frequent_itemsets = apriori(transactions, unique_items, max_k, min_support)
 
-        # Generate association rules
+        # تولید قوانین انجمنی
         print("Generating association rules...")
         rules = generateAssociationRules(frequent_itemsets, transactions, min_confidence)
 
         print(f"Generated {len(rules)} association rules")
 
-        # Clear existing rules
+        # حذف قوانین قبلی
         print("Clearing existing rules...")
         AssociationRule.objects.all().delete()
 
-        # Save rules to database
+        # ذخیره قوانین جدید در پایگاه داده
         print("Saving rules to database...")
         saved_count = 0
 
         for rule_data in rules:
             try:
-                # Create association rule
                 association_rule = AssociationRule.objects.create(
                     support=rule_data['support'],
                     confidence=rule_data['confidence'],
                     lift=rule_data['lift']
                 )
 
-                # Add antecedent products
+                # ذخیره محصولات مقدم
                 for product_name in rule_data['antecedent']:
                     product, created = Product.objects.get_or_create(
                         name=product_name,
@@ -251,7 +244,7 @@ def extract_frequent_patterns(min_support=0.01, min_confidence=0.5, max_k=3):
                         is_antecedent=True
                     )
 
-                # Add consequent products
+                # ذخیره محصولات تالی
                 for product_name in rule_data['consequent']:
                     product, created = Product.objects.get_or_create(
                         name=product_name,
@@ -272,7 +265,7 @@ def extract_frequent_patterns(min_support=0.01, min_confidence=0.5, max_k=3):
 
         print(f"Successfully saved {saved_count} association rules to database")
 
-        # Print sample results
+        # چاپ چند قانون نمونه
         print("\nSample Association Rules:")
         for i, rule in enumerate(rules[:5]):
             antecedent_str = ", ".join(rule['antecedent'])
@@ -297,12 +290,12 @@ def extract_frequent_patterns(min_support=0.01, min_confidence=0.5, max_k=3):
 
 
 def get_product_recommendations(product_names, limit=5):
-    """Get product recommendations based on association rules."""
+    """دریافت توصیه محصول بر اساس قوانین انجمنی"""
     if not product_names:
         return []
 
     try:
-        # Find rules where any of the input products are in antecedent
+        # یافتن قوانینی که ورودی‌ها در قسمت مقدم آن‌ها باشند
         antecedent_rules = AssociationRule.objects.filter(
             products__product__name__in=product_names,
             products__is_antecedent=True
@@ -311,8 +304,7 @@ def get_product_recommendations(product_names, limit=5):
         recommendations = []
         seen_products = set(product_names)
 
-        for rule in antecedent_rules[:limit * 2]:  # Get more to filter
-            # Get consequent products for this rule
+        for rule in antecedent_rules[:limit * 2]:
             consequent_products = rule.products.filter(is_antecedent=False)
 
             for rule_product in consequent_products:
@@ -338,13 +330,11 @@ def get_product_recommendations(product_names, limit=5):
         return []
 
 
-# Test function
 def test_apriori():
-    """Test the Apriori implementation."""
+    """اجرای تست الگوریتم Apriori"""
     result = extract_frequent_patterns()
     print("Test Results:", result)
 
-    # Test recommendations
     if result['success']:
         sample_products = ['محصول 4', 'محصول 6']
         recommendations = get_product_recommendations(sample_products)

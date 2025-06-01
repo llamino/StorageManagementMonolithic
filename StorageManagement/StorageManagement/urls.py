@@ -61,7 +61,7 @@ urlpatterns = [
     path('api/products/', include('products.urls')),
     path('api/orders/', include('orders.urls')),
     path('api/discounts/', include('discounts.urls')),
-
+    path('api/recommendations/', include('recommendations.urls')),
     # Swagger URLs
     path('swagger/output.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

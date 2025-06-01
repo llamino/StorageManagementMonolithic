@@ -80,6 +80,8 @@ class UserDiscountViewSet(viewsets.ModelViewSet):
     queryset = UserDiscount.objects.filter(is_active=True)
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return UserDiscount.objects.none()
         return UserDiscount.objects.filter(
             user=self.request.user,
             is_active=True

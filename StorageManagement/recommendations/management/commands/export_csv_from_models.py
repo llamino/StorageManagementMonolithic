@@ -63,7 +63,7 @@ def add_data_to_csv():
             )
             
             for index, item in enumerate(order_items):
-                if index == 20:
+                if index == 15:
                     break
                 # Get user rating for this product if exists
                 try:
