@@ -16,7 +16,15 @@ from .serializers import ProfileSerializer,LoginSerializer, UserProfileSerialize
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 logger = logging.getLogger(__name__)
+
+
+# =========================================================================================================================================================
+
+
+
 
 @swagger_auto_schema(
     tags=['Addresses'],
@@ -162,10 +170,18 @@ class AddressViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+
+
+# =========================================================================================================================================================
+
+
+
+
 @swagger_auto_schema(
     tags=['UserProfile'],
     operation_description="API endpoints for managing user profile",
 )
+
 class UserProfileView(APIView):
     """
     View for managing user profile.
@@ -187,6 +203,7 @@ class UserProfileView(APIView):
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
     @swagger_auto_schema(
         operation_description="Fully update the authenticated user's profile",
         request_body=UserProfileSerializer,
@@ -195,30 +212,9 @@ class UserProfileView(APIView):
     def put(self, request):
         """
         Fully update the authenticated user's profile.
-
-        Handles form-data format for profile updates.
-
-        Original Persian comment:
-        # این تغییر ساختار به این دلیل است که در postman داده ها را به صورت form-data ارسال میکنم. اگر قرار بود به صورت json ارسال کنم، نیاز نبود که به این شکل تغییر ساختار بدهم
-        # حذف 'profile[' و ']' از کلیدها
-        # حذف کلیدهای مربوط به پروفایل از دیکشنری اصلی
-        # اضافه کردن دیکشنری پروفایل به دیکشنری اصلی
         """
         user = request.user
-        data = request.data
-        profile_data = {}
-        # این تغییر ساختار به این دلیل است که در postman داده ها را به صورت form-data ارسال میکنم. اگر قرار بود به صورت json ارسال کنم، نیاز نبود که به این شکل تغییر ساختار بدهم
-        for key, value in data.items():
-            if key.startswith('profile[') and key.endswith(']'):
-                # حذف 'profile[' و ']' از کلیدها
-                profile_key = key[8:-1]
-                profile_data[profile_key] = value[0] if isinstance(value, list) else value
-        # حذف کلیدهای مربوط به پروفایل از دیکشنری اصلی
-        data = {k: v for k, v in data.items() if not k.startswith('profile[')}
-        # اضافه کردن دیکشنری پروفایل به دیکشنری اصلی
-        data['profile'] = profile_data
-
-        serializer = self.serializer_class(user, data=data, partial=False)
+        serializer = self.serializer_class(user, data=request.data, partial=False)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -259,10 +255,18 @@ class UserProfileView(APIView):
         return Response({"detail": "User deactivated successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 
+
+
+# =========================================================================================================================================================
+
+
+
+
 @swagger_auto_schema(
     tags=['Register'],
     operation_description="API endpoint for user registration",
 )
+
 class RegisterView(APIView):
     """
     View for user registration.
@@ -292,7 +296,9 @@ class RegisterView(APIView):
             try:
                 user = serializer.save()
                 logger.info(f"New user registered: {user.email}")
-                return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+                refresh = RefreshToken.for_user(user)
+
+                return Response({'access token': str(refresh.access_token), 'refresh token': str(refresh),'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
             except Exception as e:
                 logger.error(f"Error saving user: {e}")
                 return Response({'error': 'An error occurred while creating the user'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -300,16 +306,15 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(
-    tags=['Authentication'],
-    operation_description="API endpoint for user login",
-)
-class LoginView(APIView):
-    """
-    View for user login.
 
-    Provides operation to authenticate a user and get JWT tokens.
-    """
+
+# =========================================================================================================================================================
+
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginView(APIView):
 
     @swagger_auto_schema(
         operation_description="Login with email and password",
@@ -328,11 +333,6 @@ class LoginView(APIView):
         }
     )
     def post(self, request):
-        """
-        Login with email and password.
-
-        Returns JWT access and refresh tokens on successful authentication.
-        """
         serializer = LoginSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -353,11 +353,17 @@ class LoginView(APIView):
                 'refresh': str(refresh)
             }, status=status.HTTP_200_OK)
         except AuthenticationFailed as e:
-            logger.warning(f"Authentication failed for email: {email} - {e}")
             return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:
             logger.error(f"Unexpected error during login: {e}")
             return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+# =========================================================================================================================================================
+
+
 
 
 @swagger_auto_schema(
@@ -411,6 +417,14 @@ class RefreshAccessTokenView(APIView):
         except Exception as e:
             logger.error(f"Unexpected error while refreshing token: {e}")
             return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+# =========================================================================================================================================================
+
+
+
 
 
 @swagger_auto_schema(
@@ -475,6 +489,14 @@ class LogoutView(APIView):
         except Exception as e:
             logger.error(f"Unexpected error during logout for user {request.user.email}: {str(e)}")
             return JsonResponse({"msg": "Failed to log out", "error": str(e)}, status=400)
+
+
+
+
+# =========================================================================================================================================================
+
+
+
 
 
 @swagger_auto_schema(

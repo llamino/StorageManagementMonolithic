@@ -61,15 +61,28 @@ class ProductViewSet(ModelViewSet):
     ViewSet for managing products.
 
     Provides CRUD operations for Product objects.
-    Note: If a category sent for a product doesn't exist in the Category table, 
+    Note: If a category sent for a product doesn't exist in the Category table,
     that category will be added to the Category table.
 
-    Original Persian description:
-    در این کلاس، عملیات croud روی جدول Product انجام میشود. نکته: همچنین اگر دسته بندی ای که برای محصول ارسال میشود،‌ در جدول Category وجود نداشته باشد، آن دسته بندی به جدول Category اضافه میشود.
+    فارسی:
+    در این کلاس، عملیات CRUD روی جدول Product انجام میشود.
+    همچنین اگر دسته‌بندی ارسال‌شده برای محصول در جدول Category وجود نداشته باشد،
+    آن دسته‌بندی به جدول Category اضافه خواهد شد.
     """
     serializer_class = ProductSerializer
-    queryset = Product.objects.all()
-    permission_classes = [IsAdminUser]
+    queryset = Product.objects.all().order_by('-create_date')
+
+    def get_permissions(self):
+        """
+        - کاربران عادی فقط می‌توانند لیست محصولات را ببینند (GET).
+        - فقط ادمین‌ها می‌توانند محصول ایجاد/ویرایش/حذف کنند.
+        """
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticatedOrReadOnly]
+        else:
+            permission_classes = [IsAdminUser]
+        return [perm() for perm in permission_classes]
+
 
 
 @swagger_auto_schema(
@@ -120,9 +133,11 @@ class CommentView(generics.ListCreateAPIView, generics.DestroyAPIView):
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
 class AddProductPropertyApiView(APIView):
     @swagger_auto_schema(
-        tags=['Products'],
+        tags=['products'],
         operation_description="Add product property",
         request_body=ProductPropertySerializer,
         responses={200: ProductPropertySerializer()}

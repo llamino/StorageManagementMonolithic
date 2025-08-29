@@ -1,8 +1,7 @@
 swagger: '2.0'
 info:
   title: Storage Management API
-  description: API for managing storage, products, suppliers, warehouses, and users
-  termsOfService: https://www.example.com/terms/
+  description: مدیریت انبار - سیستم جامع مدیریت محصولات، سفارشات و انبار
   contact:
     email: contact@example.com
   license:
@@ -11,16 +10,20 @@ info:
 host: 127.0.0.1:8000
 schemes:
 - http
-basePath: /
+basePath: /api
 consumes:
 - application/json
 produces:
 - application/json
 securityDefinitions:
-  Basic:
-    type: basic
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: 'JWT Authorization header using the Bearer scheme. Example: "Bearer
+      {token}"'
 security:
-- Basic: []
+- Bearer: []
 paths:
   /account/address/:
     get:
@@ -411,6 +414,339 @@ paths:
       tags:
       - account
     parameters: []
+  /discounts/category-discounts/:
+    get:
+      operationId: discounts_category-discounts_list
+      description: دریافت لیست تخفیف‌های دسته‌بندی
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CategoryDiscount'
+        '401':
+          description: عدم احراز هویت
+      tags:
+      - discounts
+    post:
+      operationId: discounts_category-discounts_create
+      description: ایجاد تخفیف جدید برای دسته‌بندی
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CategoryDiscount'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategoryDiscount'
+        '400':
+          description: خطا در داده‌های ورودی
+        '401':
+          description: عدم احراز هویت
+      tags:
+      - discounts
+    parameters: []
+  /discounts/category-discounts/{id}/:
+    get:
+      operationId: discounts_category-discounts_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategoryDiscount'
+      tags:
+      - discounts
+    put:
+      operationId: discounts_category-discounts_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CategoryDiscount'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategoryDiscount'
+      tags:
+      - discounts
+    patch:
+      operationId: discounts_category-discounts_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CategoryDiscount'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CategoryDiscount'
+      tags:
+      - discounts
+    delete:
+      operationId: discounts_category-discounts_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - discounts
+    parameters:
+    - name: id
+      in: path
+      description: A unique integer value identifying this category discount.
+      required: true
+      type: integer
+  /discounts/product-discounts/:
+    get:
+      operationId: discounts_product-discounts_list
+      description: دریافت لیست تخفیف‌های محصول
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ProductDiscount'
+        '401':
+          description: عدم احراز هویت
+      tags:
+      - discounts
+    post:
+      operationId: discounts_product-discounts_create
+      description: ایجاد تخفیف جدید برای محصول
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProductDiscount'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProductDiscount'
+        '400':
+          description: خطا در داده‌های ورودی
+        '401':
+          description: عدم احراز هویت
+      tags:
+      - discounts
+    parameters: []
+  /discounts/product-discounts/{id}/:
+    get:
+      operationId: discounts_product-discounts_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProductDiscount'
+      tags:
+      - discounts
+    put:
+      operationId: discounts_product-discounts_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProductDiscount'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProductDiscount'
+      tags:
+      - discounts
+    patch:
+      operationId: discounts_product-discounts_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProductDiscount'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProductDiscount'
+      tags:
+      - discounts
+    delete:
+      operationId: discounts_product-discounts_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - discounts
+    parameters:
+    - name: id
+      in: path
+      description: A unique integer value identifying this product discount.
+      required: true
+      type: integer
+  /discounts/user-discounts/:
+    get:
+      operationId: discounts_user-discounts_list
+      description: دریافت لیست تخفیف‌های کاربر
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserDiscount'
+        '401':
+          description: عدم احراز هویت
+      tags:
+      - discounts
+    post:
+      operationId: discounts_user-discounts_create
+      description: ایجاد تخفیف جدید برای کاربر
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserDiscount'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/UserDiscount'
+        '400':
+          description: خطا در داده‌های ورودی
+        '401':
+          description: عدم احراز هویت
+      tags:
+      - discounts
+    parameters: []
+  /discounts/user-discounts/{id}/:
+    get:
+      operationId: discounts_user-discounts_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/UserDiscount'
+      tags:
+      - discounts
+    put:
+      operationId: discounts_user-discounts_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserDiscount'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/UserDiscount'
+      tags:
+      - discounts
+    patch:
+      operationId: discounts_user-discounts_partial_update
+      description: ''
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserDiscount'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/UserDiscount'
+      tags:
+      - discounts
+    delete:
+      operationId: discounts_user-discounts_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - discounts
+    parameters:
+    - name: id
+      in: path
+      description: A unique integer value identifying this user discount.
+      required: true
+      type: integer
+  /orders/cancel-order/:
+    post:
+      operationId: orders_cancel-order_create
+      description: لغو سفارش
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          required:
+          - order_id
+          type: object
+          properties:
+            order_id:
+              description: شناسه سفارش
+              type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Order'
+        '404':
+          description: سفارش یافت نشد
+      tags:
+      - orders
+    parameters: []
+  /orders/list-order-items/{order_id}/:
+    get:
+      operationId: orders_list-order-items_read
+      description: نمایش اطلاعات یک سفارش به‌همراه آیتم‌های آن
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Order'
+        '404':
+          description: سفارش یافت نشد
+      tags:
+      - orders
+    parameters:
+    - name: order_id
+      in: path
+      required: true
+      type: string
   /products/categories/:
     get:
       operationId: products_categories_list
@@ -606,9 +942,11 @@ paths:
   /products/create_comment/{product_name}/:
     get:
       operationId: products_create_comment_read
-      summary: View for managing product comments.
-      description: Provides operations to list, create, and delete comments for a
-        specific product.
+      description: |-
+        View for managing product comments:
+        - List all comments for a product (GET)
+        - Create a new comment (POST)
+        - Delete a comment (DELETE)
       parameters: []
       responses:
         '200':
@@ -621,9 +959,11 @@ paths:
       - products
     post:
       operationId: products_create_comment_create
-      summary: View for managing product comments.
-      description: Provides operations to list, create, and delete comments for a
-        specific product.
+      description: |-
+        View for managing product comments:
+        - List all comments for a product (GET)
+        - Create a new comment (POST)
+        - Delete a comment (DELETE)
       parameters:
       - name: data
         in: body
@@ -639,24 +979,13 @@ paths:
       - products
     delete:
       operationId: products_create_comment_delete
-      description: Delete a comment for a specific product
-      parameters:
-      - name: data
-        in: body
-        required: true
-        schema:
-          required:
-          - comment_id
-          type: object
-          properties:
-            comment_id:
-              description: ID of the comment to delete
-              type: integer
+      description: Delete a comment by ID for a specific product
+      parameters: []
       responses:
         '204':
-          description: No content - comment deleted successfully
+          description: Comment deleted successfully
         '404':
-          description: Not found - comment does not exist or user is not the owner
+          description: Comment not found or permission denied
       tags:
       - products
     parameters:
@@ -664,12 +993,32 @@ paths:
       in: path
       required: true
       type: string
+  /products/create_product-property/:
+    post:
+      operationId: products_create_product-property_create
+      description: Add product property
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProductProperty'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProductProperty'
+      tags:
+      - Products
+    parameters: []
   /products/delete_comment/{product_name}/:
     get:
       operationId: products_delete_comment_read
-      summary: View for managing product comments.
-      description: Provides operations to list, create, and delete comments for a
-        specific product.
+      description: |-
+        View for managing product comments:
+        - List all comments for a product (GET)
+        - Create a new comment (POST)
+        - Delete a comment (DELETE)
       parameters: []
       responses:
         '200':
@@ -682,9 +1031,11 @@ paths:
       - products
     post:
       operationId: products_delete_comment_create
-      summary: View for managing product comments.
-      description: Provides operations to list, create, and delete comments for a
-        specific product.
+      description: |-
+        View for managing product comments:
+        - List all comments for a product (GET)
+        - Create a new comment (POST)
+        - Delete a comment (DELETE)
       parameters:
       - name: data
         in: body
@@ -700,24 +1051,13 @@ paths:
       - products
     delete:
       operationId: products_delete_comment_delete
-      description: Delete a comment for a specific product
-      parameters:
-      - name: data
-        in: body
-        required: true
-        schema:
-          required:
-          - comment_id
-          type: object
-          properties:
-            comment_id:
-              description: ID of the comment to delete
-              type: integer
+      description: Delete a comment by ID for a specific product
+      parameters: []
       responses:
         '204':
-          description: No content - comment deleted successfully
+          description: Comment deleted successfully
         '404':
-          description: Not found - comment does not exist or user is not the owner
+          description: Comment not found or permission denied
       tags:
       - products
     parameters:
@@ -728,9 +1068,11 @@ paths:
   /products/get_comment/{product_name}/:
     get:
       operationId: products_get_comment_read
-      summary: View for managing product comments.
-      description: Provides operations to list, create, and delete comments for a
-        specific product.
+      description: |-
+        View for managing product comments:
+        - List all comments for a product (GET)
+        - Create a new comment (POST)
+        - Delete a comment (DELETE)
       parameters: []
       responses:
         '200':
@@ -743,9 +1085,11 @@ paths:
       - products
     post:
       operationId: products_get_comment_create
-      summary: View for managing product comments.
-      description: Provides operations to list, create, and delete comments for a
-        specific product.
+      description: |-
+        View for managing product comments:
+        - List all comments for a product (GET)
+        - Create a new comment (POST)
+        - Delete a comment (DELETE)
       parameters:
       - name: data
         in: body
@@ -761,24 +1105,13 @@ paths:
       - products
     delete:
       operationId: products_get_comment_delete
-      description: Delete a comment for a specific product
-      parameters:
-      - name: data
-        in: body
-        required: true
-        schema:
-          required:
-          - comment_id
-          type: object
-          properties:
-            comment_id:
-              description: ID of the comment to delete
-              type: integer
+      description: Delete a comment by ID for a specific product
+      parameters: []
       responses:
         '204':
-          description: No content - comment deleted successfully
+          description: Comment deleted successfully
         '404':
-          description: Not found - comment does not exist or user is not the owner
+          description: Comment not found or permission denied
       tags:
       - products
     parameters:
@@ -976,6 +1309,48 @@ paths:
     - name: name
       in: path
       description: A unique value identifying this size.
+      required: true
+      type: string
+  /recommendations/frequent_products/{product_name}/:
+    get:
+      operationId: recommendations_frequent_products_read
+      description: this endpoint will return products that mostly bought with current
+        product.
+      parameters:
+      - name: product_name
+        in: path
+        description: Name of the product
+        required: true
+        type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+      - recommendations
+    parameters:
+    - name: product_name
+      in: path
+      required: true
+      type: string
+  /recommendations/recommend_related_products/{user_email}/:
+    get:
+      operationId: recommendations_recommend_related_products_read
+      description: Get personalized product recommendations using hybrid approach
+      parameters: []
+      responses:
+        '200':
+          description: Successfully retrieved recommendations
+        '400':
+          description: Invalid user email
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+      tags:
+      - recommendations
+    parameters:
+    - name: user_email
+      in: path
       required: true
       type: string
   /suppliers/categories/:
@@ -1711,11 +2086,22 @@ paths:
   /warehouses/inventory/transmit/{origin_warehouse_name}/{destination_warehouse_name}/:
     post:
       operationId: warehouses_inventory_transmit_create
-      description: API endpoint to transmit a product between warehouses.
-      parameters: []
+      description: API endpoint to transmit a product between warehouses
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/AddProduct'
       responses:
         '201':
           description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AddProduct'
       tags:
       - warehouses
     parameters:
@@ -2119,11 +2505,15 @@ paths:
   /warehouses/warehouse_employees/{id}/:
     get:
       operationId: warehouses_warehouse_employees_read
-      description: API endpoint to list all employees in a warehouse.
+      description: API endpoint to list all employees in a warehouse
       parameters: []
       responses:
         '200':
           description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Employee'
       tags:
       - warehouses
     parameters:
@@ -2237,6 +2627,10 @@ definitions:
   Address:
     type: object
     properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
       province:
         title: Province
         type: string
@@ -2372,9 +2766,277 @@ definitions:
         type: string
         maxLength: 11
         minLength: 1
-  Category:
+  CategoryDiscount:
+    required:
+    - name
+    - discount_type
+    - value
+    - start_date
+    - end_date
+    - category
     type: object
-    properties: {}
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      description:
+        title: Description
+        type: string
+        x-nullable: true
+      discount_type:
+        title: Discount type
+        type: string
+        enum:
+        - percentage
+        - fixed
+      value:
+        title: Value
+        type: string
+        format: decimal
+      start_date:
+        title: Start date
+        type: string
+        format: date-time
+      end_date:
+        title: End date
+        type: string
+        format: date-time
+      is_active:
+        title: Is active
+        type: boolean
+      category:
+        title: Category
+        type: string
+  ProductDiscount:
+    required:
+    - name
+    - discount_type
+    - value
+    - start_date
+    - end_date
+    - product
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      description:
+        title: Description
+        type: string
+        x-nullable: true
+      discount_type:
+        title: Discount type
+        type: string
+        enum:
+        - percentage
+        - fixed
+      value:
+        title: Value
+        type: string
+        format: decimal
+      start_date:
+        title: Start date
+        type: string
+        format: date-time
+      end_date:
+        title: End date
+        type: string
+        format: date-time
+      is_active:
+        title: Is active
+        type: boolean
+      product:
+        title: Product
+        type: string
+  UserDiscount:
+    required:
+    - name
+    - discount_type
+    - value
+    - start_date
+    - end_date
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
+      description:
+        title: Description
+        type: string
+        x-nullable: true
+      discount_type:
+        title: Discount type
+        type: string
+        enum:
+        - percentage
+        - fixed
+      value:
+        title: Value
+        type: string
+        format: decimal
+      start_date:
+        title: Start date
+        type: string
+        format: date-time
+      end_date:
+        title: End date
+        type: string
+        format: date-time
+      is_active:
+        title: Is active
+        type: boolean
+      min_purchase_amount:
+        title: Min purchase amount
+        type: string
+        format: decimal
+      max_discount_amount:
+        title: Max discount amount
+        type: string
+        format: decimal
+        x-nullable: true
+  OrderItem:
+    required:
+    - order
+    - price
+    type: object
+    properties:
+      order:
+        title: Order
+        type: integer
+      product:
+        title: Product
+        type: integer
+        x-nullable: true
+      quantity:
+        title: Quantity
+        type: integer
+        maximum: 4294967295
+        minimum: 0
+      price:
+        title: Price
+        type: string
+        format: decimal
+      discount:
+        title: Discount
+        type: string
+        format: decimal
+      discount_reason:
+        title: Discount reason
+        type: string
+        x-nullable: true
+      total_price:
+        title: Total price
+        type: string
+        format: decimal
+        readOnly: true
+  Order:
+    type: object
+    properties:
+      user:
+        title: User
+        type: integer
+        x-nullable: true
+      status:
+        title: Status
+        type: string
+        enum:
+        - pending
+        - paid
+        - shipped
+        - delivered
+        - canceled
+      payment_method:
+        title: Payment method
+        type: string
+        enum:
+        - online
+        - cash
+        - wallet
+      shipping_address:
+        title: Shipping address
+        type: integer
+        x-nullable: true
+      total_price:
+        title: Total price
+        type: string
+        format: decimal
+      final_price:
+        title: Final price
+        type: string
+        format: decimal
+      tax:
+        title: Tax
+        type: string
+        format: decimal
+      shipping_price:
+        title: Shipping price
+        type: string
+        format: decimal
+      discount:
+        title: Discount
+        type: string
+        format: decimal
+      discount_reason:
+        title: Discount reason
+        type: string
+        x-nullable: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      paid_at:
+        title: Paid at
+        type: string
+        format: date-time
+        x-nullable: true
+      shipped_at:
+        title: Shipped at
+        type: string
+        format: date-time
+        x-nullable: true
+      tracking_code:
+        title: Tracking code
+        type: string
+        maxLength: 50
+        x-nullable: true
+      notes:
+        title: Notes
+        type: string
+        x-nullable: true
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/OrderItem'
+        readOnly: true
+  Category:
+    required:
+    - name
+    type: object
+    properties:
+      name:
+        title: Name
+        type: string
+        maxLength: 100
+        minLength: 1
   Color:
     required:
     - name
@@ -2388,9 +3050,7 @@ definitions:
   Comment:
     required:
     - product
-    - user
     - title
-    - text
     type: object
     properties:
       id:
@@ -2403,6 +3063,7 @@ definitions:
       user:
         title: User
         type: integer
+        x-nullable: true
       title:
         title: Title
         type: string
@@ -2411,7 +3072,7 @@ definitions:
       text:
         title: Text
         type: string
-        minLength: 1
+        x-nullable: true
       created_date:
         title: Created date
         type: string
@@ -2451,6 +3112,37 @@ definitions:
         type: string
         maxLength: 100
         minLength: 1
+    x-nullable: true
+  ProductProperty:
+    required:
+    - product
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      product:
+        $ref: '#/definitions/Product'
+      size:
+        $ref: '#/definitions/Size'
+      color:
+        $ref: '#/definitions/Color'
+      buy_price:
+        title: Buy price
+        type: number
+        x-nullable: true
+      sell_price:
+        title: Sell price
+        type: number
+        x-nullable: true
+      weight:
+        title: Weight
+        type: number
+        x-nullable: true
+      can_sale:
+        title: Can sale
+        type: boolean
   CategorySupplier:
     required:
     - name
@@ -2618,6 +3310,19 @@ definitions:
         type: string
         readOnly: true
         format: uri
+  AddProduct:
+    required:
+    - product_id
+    - quantity
+    type: object
+    properties:
+      product_id:
+        title: Product id
+        type: integer
+      quantity:
+        title: Quantity
+        type: integer
+        minimum: 1
   PurchaseOrderList:
     required:
     - expected_delivery_date

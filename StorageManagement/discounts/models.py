@@ -17,6 +17,8 @@ class Discount(models.Model):
     description = models.TextField(blank=True, null=True)
     discount_type = models.CharField(max_length=20, choices=DISCOUNT_TYPE_CHOICES)
     value = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_reason = models.TextField(blank=True, null=True)
+    discount_code = models.CharField(max_length=20, unique=True, null=True, blank=True, editable=False)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     is_active = models.BooleanField(default=True)
@@ -35,11 +37,6 @@ class Discount(models.Model):
         if self.start_date and self.end_date and self.start_date >= self.end_date:
             raise ValidationError('تاریخ شروع باید قبل از تاریخ پایان باشد')
 
-    def save(self, *args, **kwargs):
-        """فراخوانی clean قبل از ذخیره"""
-        self.clean()
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.name} - {self.get_discount_type_display()}"
 
@@ -48,17 +45,26 @@ class Discount(models.Model):
             return (price * self.value) / 100
         return self.value
 
+    def save(self, *args, **kwargs):
+        """فراخوانی clean قبل از ذخیره"""
+        self.clean()
+        super().save(*args, **kwargs)
+
+
 class ProductDiscount(Discount):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='discounts')
 
     def __str__(self):
         return f"{self.product.name} - {self.name}"
 
-class CategoryDiscount(Discount):
+
+class CategoryUserDiscount(Discount):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='discounts')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='category_discounts')
 
     def __str__(self):
         return f"{self.category.name} - {self.name}"
+
 
 class UserDiscount(Discount):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='discounts')

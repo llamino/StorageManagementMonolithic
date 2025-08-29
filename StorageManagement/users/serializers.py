@@ -57,7 +57,7 @@ class AddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Address
-        fields = ['province', 'city', 'street', 'alley', 'house_number']
+        fields = ['id','province', 'city', 'street', 'alley', 'house_number']
         read_only_fields = ('id',)
     def create(self, validated_data):
         # مرتبط کردن کاربر جاری

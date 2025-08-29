@@ -1,32 +1,56 @@
 from rest_framework import serializers
 from .models import CategorySupplier,SizeSupplier,ColorSupplier,ProductDetailSupplier,InventorySupplier,Supplier
 
+
+# ===================================================================================================================================================
+
+
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
         fields = ('name','phone_number','address','is_active')
+
+
+# ===================================================================================================================================================
+
 
 class CategorySupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategorySupplier
         fields = ('name',)
 
+
+# ===================================================================================================================================================
+
+
 class SizeSupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = SizeSupplier
         fields = ('name',)
+
+
+# ===================================================================================================================================================
+
 
 class ColorSupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = ColorSupplier
         fields = ('name',)
 
-class CategorySupplierSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=255)
 
-    # class meta:
-    #     model = CategorySupplier
-    #     fields = '__all__'
+# ===================================================================================================================================================
+
+
+class CategorySupplierSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CategorySupplier
+        fields = ('name',)
+        extra_kwargs = {
+            'name': {'validators': []}  # حذف validators
+        }
+# ===================================================================================================================================================
+
 
 class ProductDetailSupplierSerializer(serializers.ModelSerializer):
     categories = CategorySupplierSerializer(many=True)  # سریالایزر برای دسته‌بندی‌ها
@@ -41,13 +65,13 @@ class ProductDetailSupplierSerializer(serializers.ModelSerializer):
 
         # ایجاد محصول جدید
         product = ProductDetailSupplier.objects.create(**validated_data)
-
+        categories = []
         for category_data in categories_data:
             category_name = category_data.get('name')  # استخراج نام دسته‌بندی
             category, created = CategorySupplier.objects.get_or_create(name=category_name)
-
+            categories.append(category)
             # اضافه کردن دسته‌بندی به محصول
-            product.categories.add(category)
+        product.categories.set(categories)
 
         return product
 
@@ -80,20 +104,24 @@ class ProductDetailSupplierSerializer(serializers.ModelSerializer):
 
         return instance
 
+
+# ===================================================================================================================================================
+
+
 class InventorySupplierSerializer(serializers.ModelSerializer):
-    sizes = serializers.CharField(required=False, allow_blank=True)
-    colors = serializers.CharField(required=False, allow_blank=True)
+    size = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    color = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     supplier = serializers.CharField(required=True)
 
     class Meta:
         model = InventorySupplier
-        fields = ('id', 'supplier', 'product', 'stock', 'colors', 'sizes', 'weight', 'price')
+        fields = ('id', 'supplier', 'product', 'stock', 'color', 'size', 'weight', 'price')
 
     def create(self, validated_data):
         # استخراج داده‌ها
         supplier_data = validated_data.pop('supplier', None)
-        sizes_data = validated_data.pop('sizes', None)
-        colors_data = validated_data.pop('colors', None)
+        size_data = validated_data.pop('size', None)
+        color_data = validated_data.pop('color', None)
 
         # بررسی اینکه supplier حتما وارد شده باشد
         if not supplier_data:
@@ -103,18 +131,18 @@ class InventorySupplierSerializer(serializers.ModelSerializer):
         supplier_object, created = Supplier.objects.get_or_create(name=supplier_data)
 
         size_object = None
-        if sizes_data:
-            size_object, created = SizeSupplier.objects.get_or_create(name=sizes_data)
+        if size_data:
+            size_object, created = SizeSupplier.objects.get_or_create(name=size_data)
 
-        colors_object = None
-        if colors_data:
-            colors_object, created = ColorSupplier.objects.get_or_create(name=colors_data)
+        color_object = None
+        if color_data:
+            color_object, created = ColorSupplier.objects.get_or_create(name=color_data)
 
         # ایجاد نمونه جدید
         instance = InventorySupplier.objects.create(
             supplier=supplier_object,
-            sizes=size_object,
-            colors=colors_object,
+            size=size_object,
+            color=color_object,
             **validated_data
         )
         return instance
@@ -122,8 +150,8 @@ class InventorySupplierSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         # استخراج داده‌ها
         supplier_data = validated_data.pop('supplier', None)
-        sizes_data = validated_data.pop('sizes', None)
-        colors_data = validated_data.pop('colors', None)
+        size_data = validated_data.pop('size', None)
+        color_data = validated_data.pop('color', None)
 
         # به‌روزرسانی تامین‌کننده
         if supplier_data:
@@ -133,14 +161,18 @@ class InventorySupplierSerializer(serializers.ModelSerializer):
             instance.supplier = supplier_object
 
         # به‌روزرسانی اندازه
-        if sizes_data:
-            size_object, created = SizeSupplier.objects.get_or_create(name=sizes_data)
-            instance.sizes = size_object
+        if size_data:
+            size_object, created = SizeSupplier.objects.get_or_create(name=size_data)
+            instance.size = size_object
+        elif size_data == '' or size_data is None:
+            instance.size = None
 
         # به‌روزرسانی رنگ
-        if colors_data:
-            colors_object, created = ColorSupplier.objects.get_or_create(name=colors_data)
-            instance.colors = colors_object
+        if color_data:
+            color_object, created = ColorSupplier.objects.get_or_create(name=color_data)
+            instance.color = color_object
+        elif color_data == '' or color_data is None:
+            instance.color = None
 
         # به‌روزرسانی سایر فیلدها
         for attr, value in validated_data.items():
@@ -148,7 +180,5 @@ class InventorySupplierSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-
-
 
 

@@ -205,7 +205,7 @@ class HybridRecommender:
             order_count = Order.objects.filter(user=user).count()
             if order_count == 0:
                 alpha, beta, reason = 0.7, 0.3, "new user (cold start)"
-            elif order_count < 5:
+            elif order_count < 10:
                 alpha, beta, reason = 0.5, 0.5, "few orders"
             else:
                 alpha, beta, reason = 0.3, 0.7, "experienced user"

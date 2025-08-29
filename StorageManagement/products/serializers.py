@@ -18,59 +18,53 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('name',)
+        extra_kwargs = {
+            'name': {'validators': []}  # غیرفعال کردن بررسی یکتایی
+        }
 
 class ProductSerializer(serializers.ModelSerializer):
-    categories = CategorySerializer(many=True)  # سریالایزر برای دسته‌بندی‌ها
+    categories = CategorySerializer(many=True)
 
     class Meta:
         model = Product
         fields = ['name', 'description', 'categories', 'create_date']
+        read_only_fields = ['create_date']
 
     def create(self, validated_data):
-        # استخراج دسته‌بندی‌ها از داده‌های معتبر
         categories_data = validated_data.pop('categories', [])
-
-        # ایجاد محصول جدید
         product = Product.objects.create(**validated_data)
 
-        for category_data in categories_data:
-            category_name = category_data.get('name')  # استخراج نام دسته‌بندی
-            category, created = Category.objects.get_or_create(name=category_name)
+        # استخراج نام دسته‌بندی‌ها
+        category_names = {c['name'] for c in categories_data if c.get('name')}
 
-            # اضافه کردن دسته‌بندی به محصول
-            product.categories.add(category)
+        # گرفتن یا ساختن دسته‌بندی‌ها
+        categories = []
+        for name in category_names:
+            category, _ = Category.objects.get_or_create(name=name)
+            categories.append(category)
 
+        # اتصال به محصول
+        product.categories.set(categories)
         return product
 
     def update(self, instance, validated_data):
-        categories_data = validated_data.pop('categories', [])
+        categories_data = validated_data.pop('categories', None)
 
-        # به‌روزرسانی فیلدهای محصول
+        # به‌روزرسانی فیلدها
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        if categories_data:
-            # استخراج نام دسته‌بندی‌ها
-            unique_categories = set(
-                category_data.get('name') for category_data in categories_data if category_data.get('name')
-            )
+        if categories_data is not None:
+            category_names = {c['name'] for c in categories_data if c.get('name')}
+            categories = []
+            for name in category_names:
+                category, _ = Category.objects.get_or_create(name=name)
+                categories.append(category)
 
-            # گرفتن یا ایجاد دسته‌بندی‌ها
-            existing_categories = Category.objects.filter(name__in=unique_categories)
-            existing_category_names = set(cat.name for cat in existing_categories)
-
-            new_categories = [
-                Category(name=name) for name in unique_categories if name not in existing_category_names
-            ]
-            Category.objects.bulk_create(new_categories)
-
-            # تنظیم دسته‌بندی‌ها برای محصول
-            all_categories = Category.objects.filter(name__in=unique_categories)
-            instance.categories.set(all_categories)
+            instance.categories.set(categories)
 
         return instance
-
 
 
 

@@ -18,6 +18,8 @@ class CategorySupplier(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
     def __str__(self):
         return self.name
+
+
 # Create your models here.
 class ProductDetailSupplier(models.Model):
     name = models.CharField(max_length=100, primary_key=True)
@@ -36,6 +38,7 @@ class Supplier(models.Model):
     stablished_date = models.DateField(auto_now_add=True)
     def __str__(self):
         return self.name
+
 
 class InventorySupplier(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
